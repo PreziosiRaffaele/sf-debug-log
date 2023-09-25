@@ -1,7 +1,7 @@
 import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
-import { Messages } from '@salesforce/core';
-import { Connection } from '@salesforce/core';
-import { createTraceFlag } from '../../HandleTraceFlag';
+import { Connection, Messages } from '@salesforce/core';
+import { SaveResult, Record } from 'jsforce';
+const MILLISECONDS_PER_MINUTE = 60000;
 
 Messages.importMessagesDirectory(__dirname);
 const messages = Messages.loadMessages('debug-log', 'trace.new');
@@ -26,10 +26,6 @@ export default class TraceNew extends SfCommand<TraceNewResult> {
       char: 'u',
       required: true,
     }),
-    debuglevel: Flags.string({
-      summary: messages.getMessage('flags.debuglevel.summary'),
-      default: 'SFDC_DevConsole',
-    }),
     time: Flags.integer({
       summary: messages.getMessage('flags.time.summary'),
       default: 60,
@@ -38,10 +34,23 @@ export default class TraceNew extends SfCommand<TraceNewResult> {
 
   public async run(): Promise<TraceNewResult> {
     const { flags } = await this.parse(TraceNew);
-    this.spinner.start('Creating Trace Flag...');
     const conn: Connection = flags.targetusername.getConnection();
-    const result = await createTraceFlag(conn, flags.user, flags.debuglevel, flags.time);
-    this.spinner.stop();
+    let result: TraceNewResult;
+
+    try {
+      this.spinner.start('Retriving debug levels...');
+      const [userId, debugLevels] = await Promise.all([getUserId(conn, flags.user), getDebugLevels(conn)]);
+      this.spinner.stop();
+      const debuglevel = await this.selectDebugLevel(debugLevels);
+      this.spinner.start('Creating Trace Flag...');
+      result = await createTraceFlag(conn, userId, debuglevel, flags.time);
+      this.spinner.stop();
+    } catch (err) {
+      result = {
+        isSuccess: false,
+        error: err instanceof Error ? err.message : String(err),
+      };
+    }
     if (!result.isSuccess) {
       throw messages.createError('error.createTraceFlag', [result.error]);
     } else {
@@ -49,4 +58,78 @@ export default class TraceNew extends SfCommand<TraceNewResult> {
     }
     return result;
   }
+
+  private async selectDebugLevel(debugLevels: Record[]): Promise<string> {
+    const debuglevel = await this.prompt<{ debugLevel: string }>({
+      type: 'list',
+      name: 'debugLevel',
+      message: 'Select Debug Level',
+      choices: debugLevels.map((debugLevel) => ({
+        loop: false,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/restrict-template-expressions
+        name: `${debugLevel.DeveloperName}    	(DB:${debugLevel.Database}   Callout:${debugLevel.Callout}   ApexCode:${debugLevel.ApexCode}   Validation:${debugLevel.Validation}  Workflow:${debugLevel.Workflow}    Profiling:${debugLevel.ApexProfiling}  Visualforce:${debugLevel.Visualforce}  System:${debugLevel.System}  Wave:${debugLevel.Wave}  Nba:${debugLevel.Nba})`,
+        value: debugLevel.Id,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        short: debugLevel.DeveloperName,
+      })),
+    });
+
+    return debuglevel.debugLevel;
+  }
+}
+
+async function getUserId(connection: Connection, inputUser: string): Promise<string> {
+  let result;
+  if (isValidEmail(inputUser)) {
+    result = await connection.tooling.sobject('User').findOne({ Username: inputUser });
+  } else if (isId(inputUser)) {
+    result = await connection.tooling.sobject('User').findOne({ Id: inputUser });
+  } else {
+    result = await connection.tooling.sobject('User').findOne({ Name: inputUser });
+  }
+  if (result?.Id) {
+    return result.Id;
+  } else {
+    throw new Error(`User ${inputUser} not found`);
+  }
+}
+
+function isValidEmail(input: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(input);
+}
+
+function isId(input: string): boolean {
+  const idRegex = /[a-zA-Z0-9]{15}|[a-zA-Z0-9]{18}/;
+  return idRegex.test(input);
+}
+
+async function getDebugLevels(conn: Connection): Promise<Record[]> {
+  const results = await conn.tooling.query(
+    'SELECT Id, DeveloperName, Workflow, Validation, Callout, ApexCode, ApexProfiling, Visualforce, System, Database, Wave, Nba FROM DebugLevel'
+  );
+  if (results?.records) {
+    return results.records;
+  } else {
+    throw new Error('Error to retrieve Debug Levels');
+  }
+}
+
+async function createTraceFlag(
+  conn: Connection,
+  userId: string,
+  debugLevelId: string,
+  time: number
+): Promise<TraceNewResult> {
+  const result: SaveResult = await conn.tooling.sobject('TraceFlag').create({
+    TracedEntityId: userId,
+    DebugLevelId: debugLevelId,
+    StartDate: new Date(Date.now()).toISOString(),
+    logtype: 'USER_DEBUG',
+    ExpirationDate: new Date(Date.now() + time * MILLISECONDS_PER_MINUTE).toISOString(),
+  });
+  return {
+    isSuccess: result.success,
+    error: result.success ? undefined : result.errors[0].message,
+  };
 }
