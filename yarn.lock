@@ -993,28 +993,29 @@
     strip-ansi "6.0.1"
     ts-retry-promise "^0.7.0"
 
-"@salesforce/core@^5.1.0", "@salesforce/core@^5.2.0":
-  version "5.2.0"
-  resolved "https://registry.yarnpkg.com/@salesforce/core/-/core-5.2.0.tgz#7d18439abe3d33432bae1ec9edc700430ae4ca4a"
-  integrity sha512-v5jX/7GLyZOrO9smSgtCL6zallVWIb9ryjTzAkJyB7KsHYNEKZKL9TM6uXHFM7SMYjllJQujup54EHxNbL6ezQ==
+"@salesforce/core@^5.1.0", "@salesforce/core@^5.2.0", "@salesforce/core@^5.3.5":
+  version "5.3.9"
+  resolved "https://registry.yarnpkg.com/@salesforce/core/-/core-5.3.9.tgz#1c8f793ce1a0798c5c7767a5a370a5926d3298de"
+  integrity sha512-/HX0PiXq3Sjc5eVJ0EaYetcDGsKU9O9Nj8jFGw5qYlITx8zogfxc0j07liH67tQXS1KbTysYoj/MQ2zbHSNkPA==
   dependencies:
-    "@salesforce/kit" "^3.0.6"
+    "@salesforce/kit" "^3.0.13"
     "@salesforce/schemas" "^1.6.0"
-    "@salesforce/ts-types" "^2.0.5"
-    "@types/semver" "^7.5.0"
+    "@salesforce/ts-types" "^2.0.8"
+    "@types/semver" "^7.5.3"
     ajv "^8.12.0"
     change-case "^4.1.2"
     faye "^1.4.0"
     form-data "^4.0.0"
     js2xmlparser "^4.0.1"
     jsforce "^2.0.0-beta.27"
-    jsonwebtoken "9.0.1"
+    jsonwebtoken "9.0.2"
     jszip "3.10.1"
-    pino "^8.14.2"
+    pino "^8.15.6"
     pino-abstract-transport "^1.0.0"
-    pino-pretty "^10.2.0"
+    pino-pretty "^10.2.3"
     proper-lockfile "^4.1.2"
-    ts-retry-promise "^0.7.0"
+    semver "^7.5.4"
+    ts-retry-promise "^0.7.1"
 
 "@salesforce/dev-config@^4.0.1":
   version "4.0.1"
@@ -1059,6 +1060,14 @@
     typedoc-plugin-missing-exports "0.23.0"
     typescript "^4.9.5"
     wireit "^0.9.5"
+
+"@salesforce/kit@^3.0.13":
+  version "3.0.13"
+  resolved "https://registry.yarnpkg.com/@salesforce/kit/-/kit-3.0.13.tgz#10b47ad6e0e27c3a9f97eb6a5cdcfffa9ba1f163"
+  integrity sha512-HLQ5L5bBi0tsMeH5ZHJAhHUpvNUNPQoNJt2O82Jf6C60GGsrlzwzQ5ONAHGNBgKSZ7HLr0UGL5xaA+hE9uOcgw==
+  dependencies:
+    "@salesforce/ts-types" "^2.0.8"
+    tslib "^2.6.2"
 
 "@salesforce/kit@^3.0.6", "@salesforce/kit@^3.0.8", "@salesforce/kit@^3.0.9":
   version "3.0.9"
@@ -1105,6 +1114,13 @@
   integrity sha512-hGSU3pwZKItAw567cD2hf+nwe4yPVANonb1E28bLVaRjYAI6FmdxjjTxA+wZRrTpTCpjd5TY67Lq2X1X1lY8bA==
   dependencies:
     tslib "^2.6.1"
+
+"@salesforce/ts-types@^2.0.8":
+  version "2.0.8"
+  resolved "https://registry.yarnpkg.com/@salesforce/ts-types/-/ts-types-2.0.8.tgz#e732b5a42cbec6bda79c089a0633fc643daf8bca"
+  integrity sha512-vuzLcxtThBhpuhmnoh8GFrVU8XjdoNyQm9gPtmcjUyUD/9nQIBTAX8oGoUvCiiq93c4LFEmSua+xm3yu0bbNfg==
+  dependencies:
+    tslib "^2.6.2"
 
 "@sigstore/protobuf-specs@^0.1.0":
   version "0.1.0"
@@ -1401,10 +1417,15 @@
   dependencies:
     "@types/node" "*"
 
-"@types/semver@^7.3.12", "@types/semver@^7.5.0":
+"@types/semver@^7.3.12":
   version "7.5.0"
   resolved "https://registry.yarnpkg.com/@types/semver/-/semver-7.5.0.tgz#591c1ce3a702c45ee15f47a42ade72c2fd78978a"
   integrity sha512-G8hZ6XJiHnuhQKR7ZmysCeJWE08o8T0AXtk5darsCaTVsYZhhgUrq53jizaR2FvsoeCwJhlmwTjkXBY5Pn/ZHw==
+
+"@types/semver@^7.5.3":
+  version "7.5.3"
+  resolved "https://registry.yarnpkg.com/@types/semver/-/semver-7.5.3.tgz#9a726e116beb26c24f1ccd6850201e1246122e04"
+  integrity sha512-OxepLK9EuNEIPxWNME+C6WwbRAOOI2o2BaQEGzz5Lu2e4Z5eDnEo+/aVEDMIXywoJitJ7xWd641wrGLZdtwRyw==
 
 "@types/shelljs@^0.8.12":
   version "0.8.12"
@@ -3135,12 +3156,12 @@ eslint-plugin-prefer-arrow@^1.2.1:
   resolved "https://registry.yarnpkg.com/eslint-plugin-prefer-arrow/-/eslint-plugin-prefer-arrow-1.2.3.tgz#e7fbb3fa4cd84ff1015b9c51ad86550e55041041"
   integrity sha512-J9I5PKCOJretVuiZRGvPQxCbllxGAV/viI20JO3LYblAodofBxyMnZAJ+WGeClHgANnSJberTNoFWWjrWKBuXQ==
 
-eslint-plugin-sf-plugin@^1.16.2:
-  version "1.16.2"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-sf-plugin/-/eslint-plugin-sf-plugin-1.16.2.tgz#20679e164e0ddad6f55bd2f492681e8eaaddb481"
-  integrity sha512-iOsbU5pdqzbvbV8p/4uHE920JWhRL3M393qoZDeNFjUo6YAP6DucrnQf+k8soijx79Y0ZtDxKuXveYVYSjVNUA==
+eslint-plugin-sf-plugin@^1.16.9:
+  version "1.16.9"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-sf-plugin/-/eslint-plugin-sf-plugin-1.16.9.tgz#0c8bfa7b51b52c716bf8cecbb271237931bffa3b"
+  integrity sha512-VOAA1OEieGCzimavNvI1OP2AnlR5SZfxi4Q+WDahxJcedh5/SP0DEynW8ww+begy4Nt0APdLzwXN1JJTZQCemA==
   dependencies:
-    "@salesforce/core" "^5.2.0"
+    "@salesforce/core" "^5.3.5"
     "@typescript-eslint/utils" "^5.59.11"
 
 eslint-scope@^5.1.1:
@@ -4708,15 +4729,21 @@ jsonparse@^1.2.0, jsonparse@^1.3.1:
   resolved "https://registry.yarnpkg.com/jsonparse/-/jsonparse-1.3.1.tgz#3f4dae4a91fac315f71062f8521cc239f1366280"
   integrity sha512-POQXvpdL69+CluYsillJ7SUhKvytYjW9vG/GKpnf+xP8UWgYEM/RaMzHHofbALDiKbbP1W8UEYmgGl39WkPZsg==
 
-jsonwebtoken@9.0.1:
-  version "9.0.1"
-  resolved "https://registry.yarnpkg.com/jsonwebtoken/-/jsonwebtoken-9.0.1.tgz#81d8c901c112c24e497a55daf6b2be1225b40145"
-  integrity sha512-K8wx7eJ5TPvEjuiVSkv167EVboBDv9PZdDoF7BgeQnBLVvZWW9clr2PsQHVJDTKaEIH5JBIwHujGcHp7GgI2eg==
+jsonwebtoken@9.0.2:
+  version "9.0.2"
+  resolved "https://registry.yarnpkg.com/jsonwebtoken/-/jsonwebtoken-9.0.2.tgz#65ff91f4abef1784697d40952bb1998c504caaf3"
+  integrity sha512-PRp66vJ865SSqOlgqS8hujT5U4AOgMfhrwYIuIhfKaoSCZcirrmASQr8CX7cUg+RMih+hgznrjp99o+W4pJLHQ==
   dependencies:
     jws "^3.2.2"
-    lodash "^4.17.21"
+    lodash.includes "^4.3.0"
+    lodash.isboolean "^3.0.3"
+    lodash.isinteger "^4.0.4"
+    lodash.isnumber "^3.0.3"
+    lodash.isplainobject "^4.0.6"
+    lodash.isstring "^4.0.1"
+    lodash.once "^4.0.0"
     ms "^2.1.1"
-    semver "^7.3.8"
+    semver "^7.5.4"
 
 jszip@3.10.1, jszip@^3.10.1:
   version "3.10.1"
@@ -4831,15 +4858,40 @@ lodash.get@^4.4.2:
   resolved "https://registry.yarnpkg.com/lodash.get/-/lodash.get-4.4.2.tgz#2d177f652fa31e939b4438d5341499dfa3825e99"
   integrity sha512-z+Uw/vLuy6gQe8cfaFWD7p0wVv8fJl3mbzXh33RS+0oW2wvUqiRXiQ69gLWSLpgB5/6sU+r6BlQR0MBILadqTQ==
 
+lodash.includes@^4.3.0:
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/lodash.includes/-/lodash.includes-4.3.0.tgz#60bb98a87cb923c68ca1e51325483314849f553f"
+  integrity sha512-W3Bx6mdkRTGtlJISOvVD/lbqjTlPPUDTMnlXZFnVwi9NKJ6tiAk6LVdlhZMm17VZisqhKcgzpO5Wz91PCt5b0w==
+
+lodash.isboolean@^3.0.3:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/lodash.isboolean/-/lodash.isboolean-3.0.3.tgz#6c2e171db2a257cd96802fd43b01b20d5f5870f6"
+  integrity sha512-Bz5mupy2SVbPHURB98VAcw+aHh4vRV5IPNhILUCsOzRmsTmSQ17jIuqopAentWoehktxGd9e/hbIXq980/1QJg==
+
 lodash.isfunction@^3.0.9:
   version "3.0.9"
   resolved "https://registry.yarnpkg.com/lodash.isfunction/-/lodash.isfunction-3.0.9.tgz#06de25df4db327ac931981d1bdb067e5af68d051"
   integrity sha512-AirXNj15uRIMMPihnkInB4i3NHeb4iBtNg9WRWuK2o31S+ePwwNmDPaTL3o7dTJ+VXNZim7rFs4rxN4YU1oUJw==
 
+lodash.isinteger@^4.0.4:
+  version "4.0.4"
+  resolved "https://registry.yarnpkg.com/lodash.isinteger/-/lodash.isinteger-4.0.4.tgz#619c0af3d03f8b04c31f5882840b77b11cd68343"
+  integrity sha512-DBwtEWN2caHQ9/imiNeEA5ys1JoRtRfY3d7V9wkqtbycnAmTvRRmbHKDV4a0EYc678/dia0jrte4tjYwVBaZUA==
+
+lodash.isnumber@^3.0.3:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/lodash.isnumber/-/lodash.isnumber-3.0.3.tgz#3ce76810c5928d03352301ac287317f11c0b1ffc"
+  integrity sha512-QYqzpfwO3/CWf3XP+Z+tkQsfaLL/EnUlXWVkIk5FUPc4sBdTehEqZONuyRt2P67PXAk+NXmTBcc97zw9t1FQrw==
+
 lodash.isplainobject@^4.0.6:
   version "4.0.6"
   resolved "https://registry.yarnpkg.com/lodash.isplainobject/-/lodash.isplainobject-4.0.6.tgz#7c526a52d89b45c45cc690b88163be0497f550cb"
   integrity sha512-oSXzaWypCMHkPC3NvBEaPHf0KsA5mvPrOPgQWDsbg8n7orZ290M0BmC/jgRZ4vcJ6DTAhjrsSYgdsW/F+MFOBA==
+
+lodash.isstring@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/lodash.isstring/-/lodash.isstring-4.0.1.tgz#d527dfb5456eca7cc9bb95d5daeaf88ba54a5451"
+  integrity sha512-0wJxfxH1wgO3GrbuP+dTTk7op+6L41QCXbGINEmD+ny/G/eCqGzxyCsh7159S+mgDDcoarnBw6PC1PS5+wUGgw==
 
 lodash.kebabcase@^4.1.1:
   version "4.1.1"
@@ -4855,6 +4907,11 @@ lodash.mergewith@^4.6.2:
   version "4.6.2"
   resolved "https://registry.yarnpkg.com/lodash.mergewith/-/lodash.mergewith-4.6.2.tgz#617121f89ac55f59047c7aec1ccd6654c6590f55"
   integrity sha512-GK3g5RPZWTRSeLSpgP8Xhra+pnjBC56q9FZYe1d5RN3TJ35dbkGy3YqBSMbyCrlbi+CM9Z3Jk5yTL7RCsqboyQ==
+
+lodash.once@^4.0.0:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/lodash.once/-/lodash.once-4.1.1.tgz#0dd3971213c7c56df880977d504c88fb471a97ac"
+  integrity sha512-Sb487aTOCr9drQVL8pIxOzVhafOjZN9UU54hiN8PU3uAiSV7lx1yYNpbNmex2PK6dSJoNTSJUUswT651yww3Mg==
 
 lodash.snakecase@^4.1.1:
   version "4.1.1"
@@ -6145,7 +6202,7 @@ pify@^4.0.1:
   resolved "https://registry.yarnpkg.com/pify/-/pify-4.0.1.tgz#4b2cd25c50d598735c50292224fd8c6df41e3231"
   integrity sha512-uB80kBFb/tfd68bVleG9T5GGsGPjJrLAUpR5PZIrhBnIaRTQRjqdJSsIKkOP6OAIFbj7GOrcudc5pNjZ+geV2g==
 
-pino-abstract-transport@^1.0.0, pino-abstract-transport@v1.0.0:
+pino-abstract-transport@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/pino-abstract-transport/-/pino-abstract-transport-1.0.0.tgz#cc0d6955fffcadb91b7b49ef220a6cc111d48bb3"
   integrity sha512-c7vo5OpW4wIS42hUVcT5REsL8ZljsUfBjqV/e2sFxmFEFZiq1XLUp5EYLtuDH6PEHq9W1egWqRbnLUP5FuZmOA==
@@ -6153,10 +6210,18 @@ pino-abstract-transport@^1.0.0, pino-abstract-transport@v1.0.0:
     readable-stream "^4.0.0"
     split2 "^4.0.0"
 
-pino-pretty@^10.2.0:
-  version "10.2.0"
-  resolved "https://registry.yarnpkg.com/pino-pretty/-/pino-pretty-10.2.0.tgz#c674a153e15c08d7032a826d0051d786feace1d9"
-  integrity sha512-tRvpyEmGtc2D+Lr3FulIZ+R1baggQ4S3xD2Ar93KixFEDx6SEAUP3W5aYuEw1C73d6ROrNcB2IXLteW8itlwhA==
+pino-abstract-transport@v1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/pino-abstract-transport/-/pino-abstract-transport-1.1.0.tgz#083d98f966262164504afb989bccd05f665937a8"
+  integrity sha512-lsleG3/2a/JIWUtf9Q5gUNErBqwIu1tUKTT3dUzaf5DySw9ra1wcqKjJjLX1VTY64Wk1eEOYsVGSaGfCK85ekA==
+  dependencies:
+    readable-stream "^4.0.0"
+    split2 "^4.0.0"
+
+pino-pretty@^10.2.3:
+  version "10.2.3"
+  resolved "https://registry.yarnpkg.com/pino-pretty/-/pino-pretty-10.2.3.tgz#db539c796a1421fd4d130734fa994f5a26027783"
+  integrity sha512-4jfIUc8TC1GPUfDyMSlW1STeORqkoxec71yhxIpLDQapUu8WOuoz2TTCoidrIssyz78LZC69whBMPIKCMbi3cw==
   dependencies:
     colorette "^2.0.7"
     dateformat "^4.6.3"
@@ -6178,21 +6243,21 @@ pino-std-serializers@^6.0.0:
   resolved "https://registry.yarnpkg.com/pino-std-serializers/-/pino-std-serializers-6.2.2.tgz#d9a9b5f2b9a402486a5fc4db0a737570a860aab3"
   integrity sha512-cHjPPsE+vhj/tnhCy/wiMh3M3z3h/j15zHQX+S9GkTBgqJuTuJzYJ4gUyACLhDaJ7kk9ba9iRDmbH2tJU03OiA==
 
-pino@^8.14.2:
-  version "8.15.0"
-  resolved "https://registry.yarnpkg.com/pino/-/pino-8.15.0.tgz#67c61d5e397bf297e5a0433976a7f7b8aa6f876b"
-  integrity sha512-olUADJByk4twxccmAxb1RiGKOSvddHugCV3wkqjyv+3Sooa2KLrmXrKEWOKi0XPCLasRR5jBXxioE1jxUa4KzQ==
+pino@^8.15.6:
+  version "8.16.0"
+  resolved "https://registry.yarnpkg.com/pino/-/pino-8.16.0.tgz#2465012a1d11fa2e7a0545032f636e203990ae26"
+  integrity sha512-UUmvQ/7KTZt/vHjhRrnyS7h+J7qPBQnpG80V56xmIC+o9IqYmQOw/UIny9S9zYDfRBR0ClouCr464EkBMIT7Fw==
   dependencies:
     atomic-sleep "^1.0.0"
     fast-redact "^3.1.1"
     on-exit-leak-free "^2.1.0"
-    pino-abstract-transport v1.0.0
+    pino-abstract-transport v1.1.0
     pino-std-serializers "^6.0.0"
     process-warning "^2.0.0"
     quick-format-unescaped "^4.0.3"
     real-require "^0.2.0"
     safe-stable-stringify "^2.3.1"
-    sonic-boom "^3.1.0"
+    sonic-boom "^3.7.0"
     thread-stream "^2.0.0"
 
 pkg-dir@^4.1.0, pkg-dir@^4.2.0:
@@ -6915,10 +6980,17 @@ socks@^2.6.2:
     ip "^2.0.0"
     smart-buffer "^4.2.0"
 
-sonic-boom@^3.0.0, sonic-boom@^3.1.0:
+sonic-boom@^3.0.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/sonic-boom/-/sonic-boom-3.3.0.tgz#cffab6dafee3b2bcb88d08d589394198bee1838c"
   integrity sha512-LYxp34KlZ1a2Jb8ZQgFCK3niIHzibdwtwNUWKg0qQRzsDoJ3Gfgkf8KdBTFU3SkejDEIlWwnSnpVdOZIhFMl/g==
+  dependencies:
+    atomic-sleep "^1.0.0"
+
+sonic-boom@^3.7.0:
+  version "3.7.0"
+  resolved "https://registry.yarnpkg.com/sonic-boom/-/sonic-boom-3.7.0.tgz#b4b7b8049a912986f4a92c51d4660b721b11f2f2"
+  integrity sha512-IudtNvSqA/ObjN97tfgNmOKyDOs4dNcg4cUUsHDebqsgb8wGBBwb31LIgShNO8fye0dFI52X1+tFoKKI6Rq1Gg==
   dependencies:
     atomic-sleep "^1.0.0"
 
@@ -7351,6 +7423,11 @@ ts-retry-promise@^0.7.0:
   resolved "https://registry.yarnpkg.com/ts-retry-promise/-/ts-retry-promise-0.7.0.tgz#08f2dcbbf5d2981495841cb63389a268324e8147"
   integrity sha512-x6yWZXC4BfXy4UyMweOFvbS1yJ/Y5biSz/mEPiILtJZLrqD3ZxIpzVOGGgifHHdaSe3WxzFRtsRbychI6zofOg==
 
+ts-retry-promise@^0.7.1:
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/ts-retry-promise/-/ts-retry-promise-0.7.1.tgz#176d6eee6415f07b6c7c286d3657355e284a6906"
+  integrity sha512-NhHOCZ2AQORvH42hOPO5UZxShlcuiRtm7P2jIq2L2RY3PBxw2mLnUsEdHrIslVBFya1v5aZmrR55lWkzo13LrQ==
+
 tsconfig-paths@^3.14.2:
   version "3.14.2"
   resolved "https://registry.yarnpkg.com/tsconfig-paths/-/tsconfig-paths-3.14.2.tgz#6e32f1f79412decd261f92d633a9dc1cfa99f088"
@@ -7370,6 +7447,11 @@ tslib@^2, tslib@^2.0.3, tslib@^2.1.0, tslib@^2.3.1, tslib@^2.4.1, tslib@^2.5.0, 
   version "2.6.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.6.1.tgz#fd8c9a0ff42590b25703c0acb3de3d3f4ede0410"
   integrity sha512-t0hLfiEKfMUoqhG+U1oid7Pva4bbDPHYfJNiB7BiIjRkj1pyC++4N3huJfqY6aRH6VTB0rvtzQwjM4K6qpfOig==
+
+tslib@^2.6.2:
+  version "2.6.2"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.6.2.tgz#703ac29425e7b37cd6fd456e92404d46d1f3e4ae"
+  integrity sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==
 
 tsutils@^3.21.0:
   version "3.21.0"
