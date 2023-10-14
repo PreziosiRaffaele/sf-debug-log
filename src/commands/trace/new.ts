@@ -1,6 +1,8 @@
 import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Connection, Messages } from '@salesforce/core';
 import { SaveResult, Record } from 'jsforce';
+import { getUserId } from '../../utils';
+
 const MILLISECONDS_PER_MINUTE = 60000;
 
 Messages.importMessagesDirectory(__dirname);
@@ -76,32 +78,6 @@ export default class TraceNew extends SfCommand<TraceNewResult> {
 
     return debuglevel.debugLevel;
   }
-}
-
-async function getUserId(connection: Connection, inputUser: string): Promise<string> {
-  let result;
-  if (isValidEmail(inputUser)) {
-    result = await connection.tooling.sobject('User').findOne({ Username: inputUser });
-  } else if (isId(inputUser)) {
-    result = await connection.tooling.sobject('User').findOne({ Id: inputUser });
-  } else {
-    result = await connection.tooling.sobject('User').findOne({ Name: inputUser });
-  }
-  if (result?.Id) {
-    return result.Id;
-  } else {
-    throw new Error(`User ${inputUser} not found`);
-  }
-}
-
-function isValidEmail(input: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(input);
-}
-
-function isId(input: string): boolean {
-  const idRegex = /[a-zA-Z0-9]{15}|[a-zA-Z0-9]{18}/;
-  return idRegex.test(input);
 }
 
 async function getDebugLevels(conn: Connection): Promise<Record[]> {

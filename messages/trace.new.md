@@ -1,6 +1,6 @@
 # summary
 
-Summary of a command.
+Create a trace flag for a user.
 
 # flags.targetusername.summary
 
@@ -8,15 +8,11 @@ A username or alias for the target org.
 
 # flags.user.summary
 
-A username or alias for the target org.
-
-# flags.debuglevel.summary
-
-A username or alias for the target org.
+The username of the user to create the trace flag for.
 
 # flags.time.summary
 
-A username or alias for the target org.
+The time for the trace flag.
 
 # error.createTraceFlag
 
@@ -24,6 +20,4 @@ Create User Trace Flag failed: %s.
 
 # examples
 
-- Deploy QCP:
-
-  <%= config.bin %> <%= command.id %> --targetusername <username|alias> --pathmain <path> --qcpname <name>
+example
