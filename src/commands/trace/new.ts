@@ -26,7 +26,6 @@ export default class TraceNew extends SfCommand<TraceNewResult> {
     user: Flags.string({
       summary: messages.getMessage('flags.user.summary'),
       char: 'u',
-      required: true,
     }),
     time: Flags.integer({
       summary: messages.getMessage('flags.time.summary'),
@@ -41,7 +40,8 @@ export default class TraceNew extends SfCommand<TraceNewResult> {
 
     try {
       this.spinner.start('Retriving debug levels...');
-      const [userId, debugLevels] = await Promise.all([getUserId(conn, flags.user), getDebugLevels(conn)]);
+      const user = flags.user ? flags.user : (conn.getUsername() as string);
+      const [userId, debugLevels] = await Promise.all([getUserId(conn, user), getDebugLevels(conn)]);
       this.spinner.stop();
       const debuglevel = await this.selectDebugLevel(debugLevels);
       this.spinner.start('Creating Trace Flag...');

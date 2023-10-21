@@ -27,7 +27,6 @@ export default class Retrieve extends SfCommand<RetrieveResult> {
     user: Flags.string({
       summary: messages.getMessage('flags.user.summary'),
       char: 'u',
-      required: true,
     }),
     time: Flags.integer({
       summary: messages.getMessage('flags.time.summary'),
@@ -47,7 +46,8 @@ export default class Retrieve extends SfCommand<RetrieveResult> {
     let result: RetrieveResult;
     try {
       this.spinner.start('Retriving debug logs...');
-      const userId = await getUserId(conn, flags.user);
+      const user = flags.user ? flags.user : (conn.getUsername() as string);
+      const userId = await getUserId(conn, user);
       const logs = await getLogs(conn, userId, flags.time);
       await saveLogs(conn, logs, flags.folder);
       this.spinner.stop();
