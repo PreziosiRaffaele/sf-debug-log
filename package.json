@@ -3,7 +3,7 @@
   "description": "Manage Salesforce Debug Logs",
   "version": "0.0.3",
   "dependencies": {
-    "@oclif/core": "^2.11.8",
+    "@oclif/core": "^2.15.0",
     "@salesforce/core": "^5.2.0",
     "@salesforce/kit": "^3.0.8",
     "@salesforce/sf-plugins-core": "^3.1.14",
