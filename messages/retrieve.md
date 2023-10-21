@@ -16,7 +16,7 @@ Username or alias to retrieve logs for.
 
 # flags.time.summary
 
-Start time for the logs to retrieve.
+Minutes to retrieve logs for.
 
 # flags.folder.summary
 

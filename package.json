@@ -1,9 +1,10 @@
 {
   "name": "sf-debug-log",
   "description": "Manage Salesforce Debug Logs",
-  "version": "0.0.7",
+  "version": "0.0.9",
   "dependencies": {
     "@oclif/core": "^2.11.8",
+    "@salesforce/cli": "^2.13.9",
     "@salesforce/core": "^5.2.0",
     "@salesforce/kit": "^3.0.8",
     "@salesforce/sf-plugins-core": "^3.1.14",
@@ -68,10 +69,10 @@
     ],
     "topics": {
       "trace": {
-        "description": "description for trace"
+        "description": "Manage Salesforce Trace Flags"
       },
       "debug": {
-        "description": "description for debug"
+        "description": "Manage Salesforce Debug Logs"
       }
     }
   },
