@@ -37,10 +37,11 @@ export default class TraceNew extends SfCommand<TraceNewResult> {
     const { flags } = await this.parse(TraceNew);
     const conn: Connection = flags.targetusername.getConnection();
     let result: TraceNewResult;
+    let user;
 
     try {
       this.spinner.start('Retriving debug levels...');
-      const user = flags.user ? flags.user : (conn.getUsername() as string);
+      user = flags.user ? flags.user : (conn.getUsername() as string);
       const [userId, debugLevels] = await Promise.all([getUserId(conn, user), getDebugLevels(conn)]);
       this.spinner.stop();
       const debuglevel = await this.selectDebugLevel(debugLevels);
@@ -56,7 +57,7 @@ export default class TraceNew extends SfCommand<TraceNewResult> {
     if (!result.isSuccess) {
       throw messages.createError('error.createTraceFlag', [result.error]);
     } else {
-      this.log(`User Trace Flag successfully created for ${flags.user}`);
+      this.log(`User Trace Flag successfully created for ${user}`);
     }
     return result;
   }
