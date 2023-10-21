@@ -3,7 +3,7 @@ import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Connection, Messages } from '@salesforce/core';
 import { Record } from 'jsforce';
 import sanitize from 'sanitize-filename';
-import { getUserId, createFile } from '../utils';
+import { getUserId, createFile } from '../../utils';
 
 Messages.importMessagesDirectory(__dirname);
 const messages = Messages.loadMessages('sf-debug-log', 'retrieve');
