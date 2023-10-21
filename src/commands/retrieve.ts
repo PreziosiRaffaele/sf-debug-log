@@ -50,6 +50,8 @@ export default class Retrieve extends SfCommand<RetrieveResult> {
       const userId = await getUserId(conn, flags.user);
       const logs = await getLogs(conn, userId, flags.time);
       await saveLogs(conn, logs, flags.folder);
+      this.spinner.stop();
+      return { isSuccess: true };
     } catch (err) {
       result = {
         isSuccess: false,
@@ -57,10 +59,6 @@ export default class Retrieve extends SfCommand<RetrieveResult> {
       };
       throw messages.createError('error.saveLogs', [result.error]);
     }
-    this.spinner.stop();
-    return {
-      isSuccess: true,
-    };
   }
 }
 
@@ -76,11 +74,12 @@ async function getLogs(conn: Connection, userId: string, time: number): Promise<
                                 WHERE SystemModstamp > ${startTime}
                                 AND LogUserId = '${userId}'
                                 ORDER BY SystemModstamp DESC`);
-  if (queryResult.records.length) {
-    return queryResult.records;
-  } else {
+
+  if (queryResult.records.length === 0) {
     throw new Error('No debug logs found');
   }
+
+  return queryResult.records;
 }
 
 async function saveLogs(conn: Connection, logs: Record[], directory: string): Promise<void> {
