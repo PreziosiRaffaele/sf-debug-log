@@ -6,7 +6,7 @@ import { getUserId } from '../../utils';
 const MILLISECONDS_PER_MINUTE = 60000;
 
 Messages.importMessagesDirectory(__dirname);
-const messages = Messages.loadMessages('debug-log', 'trace.new');
+const messages = Messages.loadMessages('sf-debug-log', 'trace.new');
 
 export type TraceNewResult = {
   isSuccess: boolean;

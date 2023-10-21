@@ -6,7 +6,7 @@ import sanitize from 'sanitize-filename';
 import { getUserId, createFile } from '../utils';
 
 Messages.importMessagesDirectory(__dirname);
-const messages = Messages.loadMessages('debug-log', 'retrieve');
+const messages = Messages.loadMessages('sf-debug-log', 'retrieve');
 
 export type RetrieveResult = {
   isSuccess: boolean;
