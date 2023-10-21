@@ -1,7 +1,7 @@
 {
   "name": "sf-debug-log",
   "description": "Manage Salesforce Debug Logs",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "dependencies": {
     "@oclif/core": "^2.11.8",
     "@salesforce/cli": "^2.13.9",
@@ -85,13 +85,11 @@
     "docs": "sf-docs",
     "format": "wireit",
     "lint": "wireit",
-    "postinstall": "yarn husky install",
     "postpack": "shx rm -f oclif.manifest.json",
     "prepack": "sf-prepack",
     "test": "wireit",
     "test:only": "wireit",
-    "version": "oclif readme",
-    "prepare": "husky install"
+    "version": "oclif readme"
   },
   "publishConfig": {
     "access": "public"
