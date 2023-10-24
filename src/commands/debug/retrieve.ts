@@ -6,7 +6,7 @@ import sanitize from 'sanitize-filename';
 import { getUserId, createFile } from '../../utils';
 
 Messages.importMessagesDirectory(__dirname);
-const messages = Messages.loadMessages('sf-debug-log', 'retrieve');
+const messages = Messages.loadMessages('sf-debug-log', 'debug.retrieve');
 
 export type RetrieveResult = {
   isSuccess: boolean;
@@ -36,7 +36,7 @@ export default class Retrieve extends SfCommand<RetrieveResult> {
     folder: Flags.directory({
       summary: messages.getMessage('flags.folder.summary'),
       char: 'd',
-      default: 'tools/debug/logs',
+      default: '.sfdx/tools/debug/logs',
     }),
   };
 

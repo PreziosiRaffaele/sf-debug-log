@@ -47,15 +47,15 @@ export default class TraceNew extends SfCommand<TraceNewResult> {
       const debuglevel = await this.selectDebugLevel(debugLevels);
       this.spinner.start('Creating Trace Flag...');
       result = await createTraceFlag(conn, userId, debuglevel, flags.time);
-      this.spinner.stop();
     } catch (err) {
       result = {
         isSuccess: false,
         error: err instanceof Error ? err.message : String(err),
       };
     }
+    this.spinner.stop();
     if (!result.isSuccess) {
-      throw messages.createError('error.createTraceFlag', [result.error]);
+      this.error(`Error to create Trace Flag: ${result.error}`);
     } else {
       this.log(`User Trace Flag successfully created for ${user}`);
     }
@@ -67,10 +67,10 @@ export default class TraceNew extends SfCommand<TraceNewResult> {
       type: 'list',
       name: 'debugLevel',
       message: 'Select Debug Level',
+      loop: false,
       choices: debugLevels.map((debugLevel) => ({
-        loop: false,
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/restrict-template-expressions
-        name: `${debugLevel.DeveloperName}    	(DB:${debugLevel.Database}   Callout:${debugLevel.Callout}   ApexCode:${debugLevel.ApexCode}   Validation:${debugLevel.Validation}  Workflow:${debugLevel.Workflow}    Profiling:${debugLevel.ApexProfiling}  Visualforce:${debugLevel.Visualforce}  System:${debugLevel.System}  Wave:${debugLevel.Wave}  Nba:${debugLevel.Nba})`,
+        name: `${debugLevel.DeveloperName} (DB:${debugLevel.Database} Callout:${debugLevel.Callout} APEX:${debugLevel.ApexCode} Validation:${debugLevel.Validation} Workflow:${debugLevel.Workflow} Profiling:${debugLevel.ApexProfiling} VF:${debugLevel.Visualforce} System:${debugLevel.System} Wave:${debugLevel.Wave} Nba:${debugLevel.Nba})`,
         value: debugLevel.Id,
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         short: debugLevel.DeveloperName,
