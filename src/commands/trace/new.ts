@@ -1,9 +1,7 @@
 import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Connection, Messages } from '@salesforce/core';
-import { SaveResult, Record } from 'jsforce';
-import { getUserId } from '../../utils';
-
-const MILLISECONDS_PER_MINUTE = 60000;
+import { Record } from 'jsforce';
+import { getUserId, getActiveTraceFlag, getDebugLevels, createTraceFlag } from '../../utils';
 
 Messages.importMessagesDirectory(__dirname);
 const messages = Messages.loadMessages('sf-debug-log', 'trace.new');
@@ -29,6 +27,7 @@ export default class TraceNew extends SfCommand<TraceNewResult> {
     }),
     time: Flags.integer({
       summary: messages.getMessage('flags.time.summary'),
+      char: 't',
       default: 60,
     }),
   };
@@ -42,24 +41,45 @@ export default class TraceNew extends SfCommand<TraceNewResult> {
     try {
       this.spinner.start('Retriving debug levels...');
       user = flags.user ? flags.user : (conn.getUsername() as string);
-      const [userId, debugLevels] = await Promise.all([getUserId(conn, user), getDebugLevels(conn)]);
+      const userId = await getUserId(conn, user);
+      const [activeFlag, debugLevels] = await Promise.all([getActiveTraceFlag(conn, userId), getDebugLevels(conn)]);
       this.spinner.stop();
+      if (activeFlag?.Id) {
+        const shouldProceed = await this.selectToProceed();
+        if (!shouldProceed) {
+          return { isSuccess: false, error: 'Trace Flag already exists for this user.' };
+        } else {
+          this.spinner.start('Deleting existing Trace Flag...');
+          await conn.tooling.sobject('TraceFlag').delete(activeFlag.Id);
+          this.spinner.stop();
+        }
+      }
       const debuglevel = await this.selectDebugLevel(debugLevels);
       this.spinner.start('Creating Trace Flag...');
       result = await createTraceFlag(conn, userId, debuglevel, flags.time);
+      this.spinner.stop();
+      if (!result.isSuccess) {
+        this.error(`Error to create Trace Flag: ${result.error}`);
+      } else {
+        this.log(`User Trace Flag successfully created for ${user}`);
+      }
+      return result;
     } catch (err) {
-      result = {
+      return {
         isSuccess: false,
         error: err instanceof Error ? err.message : String(err),
       };
     }
-    this.spinner.stop();
-    if (!result.isSuccess) {
-      this.error(`Error to create Trace Flag: ${result.error}`);
-    } else {
-      this.log(`User Trace Flag successfully created for ${user}`);
-    }
-    return result;
+  }
+
+  private async selectToProceed(): Promise<boolean> {
+    const proceed = await this.prompt<{ proceed: boolean }>({
+      type: 'confirm',
+      name: 'proceed',
+      message: 'Trace Flag already exists for this user. Do you want to proceed?',
+    });
+
+    return proceed.proceed;
   }
 
   private async selectDebugLevel(debugLevels: Record[]): Promise<string> {
@@ -79,34 +99,4 @@ export default class TraceNew extends SfCommand<TraceNewResult> {
 
     return debuglevel.debugLevel;
   }
-}
-
-async function getDebugLevels(conn: Connection): Promise<Record[]> {
-  const results = await conn.tooling.query(
-    'SELECT Id, DeveloperName, Workflow, Validation, Callout, ApexCode, ApexProfiling, Visualforce, System, Database, Wave, Nba FROM DebugLevel'
-  );
-  if (results?.records) {
-    return results.records;
-  } else {
-    throw new Error('Error to retrieve Debug Levels');
-  }
-}
-
-async function createTraceFlag(
-  conn: Connection,
-  userId: string,
-  debugLevelId: string,
-  time: number
-): Promise<TraceNewResult> {
-  const result: SaveResult = await conn.tooling.sobject('TraceFlag').create({
-    TracedEntityId: userId,
-    DebugLevelId: debugLevelId,
-    StartDate: new Date(Date.now()).toISOString(),
-    logtype: 'USER_DEBUG',
-    ExpirationDate: new Date(Date.now() + time * MILLISECONDS_PER_MINUTE).toISOString(),
-  });
-  return {
-    isSuccess: result.success,
-    error: result.success ? undefined : result.errors[0].message,
-  };
 }
