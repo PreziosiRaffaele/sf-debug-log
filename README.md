@@ -2,6 +2,9 @@
 
 Commands to manage Salesforce debug logs.
 
+Create trace flags for any user in the org selecting the debug level and time.
+Retrive Apex logs related to a specific user to analyze them locally.
+
 ## Install
 
 ```bash
@@ -17,16 +20,14 @@ sf plugins install sf-debug-log
 
 ## `sf trace new`
 
-Create a new trace flag.
-
 ```
 USAGE
-  $ sf trace new
+  $ sf trace new -o <value> [-u <value>] [-t <value>]
 
 FLAGS
-  -o, --targetusername=<value>  [required] A username or alias for the target org.
-  -u, --name=<value> The name of the user to trace.
+  -o, --targetusername=<value>  [required] Username or alias of the target Salesforce org.
   -t, --time=<value> [default: 60] The number of minutes to trace.
+  -u, --name=<value> [default: targetusername] Username, Name, or ID of the user for whom you want to retrieve the logs.
 
 GLOBAL FLAGS
   --json  Format output as json.
@@ -34,28 +35,31 @@ GLOBAL FLAGS
 DESCRIPTION
   Create a new trace flag.
 
+  This command is used to create a trace flag for a specific user in the Salesforce org.
+
 EXAMPLES
   sf trace new -o DeveloperEdition -u "Raffaele Preziosi" -t 10
 ```
 
 ## `sf debug retrieve`
 
-Retrieve apex log files.
-
 ```
 USAGE
-  $ sf debug retrieve
+  $  sf debug retrieve -o <value> [-u <value>] [-t <value>] [-d <value>]
 
 FLAGS
-  -o, --targetusername=<value>  [required] A username or alias for the target org.
-  -u, --name=<value> The name of the user to trace.
-  -t, --time=<value> [default: 60] Minutes to retrieve logs for.
+  -d, --folder=<value>          [default: .sfdx/tools/debug/logs] The folder where the retrieved log files will be stored.
+  -o, --targetusername=<value>  (required) Username or alias of the target Salesforce org.
+  -t, --time=<value>            [default: 60] The number of minutes to retrieve log files for.
+  -u, --user=<value>            [default: targetusername] Username, Name, or ID of the user for whom you want to retrieve the logs.
 
 GLOBAL FLAGS
   --json  Format output as json.
 
 DESCRIPTION
-  Retrieves apex log files from the Salesforce platform.
+  Retrieve Apex log files from the Salesforce platform.
+
+  This command allows you to retrieve Apex log files from a Salesforce org.
 
 EXAMPLES
   sf debug retrieve -o DeveloperEdition -u "Raffaele Preziosi" -t 10

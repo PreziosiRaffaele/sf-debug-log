@@ -1,26 +1,26 @@
 # summary
 
-Retrieve apex log files.
+Retrieve Apex log files from the Salesforce platform.
 
 # description
 
-Retrieves apex log files from the Salesforce platform.
+This command allows you to retrieve Apex log files from a Salesforce org.
 
 # flags.user.summary
 
-Username or alias to retrieve logs for.
+[default: targetusername] Username, Name, or ID of the user for whom you want to retrieve the logs.
 
 # flags.targetusername.summary
 
-Username or alias to retrieve logs for.
+Username or alias of the target Salesforce org.
 
 # flags.time.summary
 
-Minutes to retrieve logs for.
+The number of minutes to retrieve log files for.
 
 # flags.folder.summary
 
-Folder where the logs are stored.
+The folder where the retrieved log files will be stored.
 
 # error.saveLogs
 
@@ -28,4 +28,4 @@ Failed to save logs: %s.
 
 # examples
 
-- <%= config.bin %> <%= command.id %>
+sf debug retrieve -o MyDeveloperEdition -u "Raffaele Preziosi" -t 10

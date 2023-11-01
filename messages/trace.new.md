@@ -2,13 +2,17 @@
 
 Create a trace flag for a user.
 
+# description
+
+This command is used to create a trace flag for a specific user in the Salesforce org.
+
 # flags.targetusername.summary
 
-A username or alias for the target org.
+Username or alias of the target Salesforce org.
 
 # flags.user.summary
 
-The username of the user to create the trace flag for.
+[default: targetusername] Username, Name, or ID of the user for whom you want to retrieve the logs.
 
 # flags.time.summary
 
@@ -20,4 +24,4 @@ Create User Trace Flag failed: %s.
 
 # examples
 
-example
+sf trace new -o MyDeveloperEdition -u "Raffaele Preziosi" -t 10
