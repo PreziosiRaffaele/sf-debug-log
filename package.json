@@ -1,7 +1,7 @@
 {
   "name": "sf-debug-log",
   "description": "Manage Salesforce Debug Logs",
-  "version": "0.0.21",
+  "version": "0.0.22",
   "dependencies": {
     "@oclif/core": "^2.11.8",
     "@salesforce/core": "^5.2.0",
@@ -72,6 +72,9 @@
       },
       "debug": {
         "description": "Manage Salesforce Debug Logs"
+      },
+      "debuglevel": {
+        "description": "Manage Salesforce Debug Levels"
       }
     }
   },

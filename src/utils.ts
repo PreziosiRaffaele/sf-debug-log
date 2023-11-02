@@ -4,6 +4,7 @@ import { writeFile, mkdir } from 'fs';
 import { Connection } from '@salesforce/core';
 import { SaveResult, Record } from 'jsforce';
 import { TraceNewResult } from './commands/trace/new';
+import { DebuglevelNewResult } from './commands/debuglevel/new';
 
 const mkdirPromise = promisify(mkdir);
 const writeFilePromise = promisify(writeFile);
@@ -78,6 +79,14 @@ export async function createTraceFlag(
     logtype: 'USER_DEBUG',
     ExpirationDate: new Date(Date.now() + time * MILLISECONDS_PER_MINUTE).toISOString(),
   });
+  return {
+    isSuccess: result.success,
+    error: result.success ? undefined : result.errors[0].message,
+  };
+}
+
+export async function createDebugLevel(conn: Connection, debugLevel: Record): Promise<DebuglevelNewResult> {
+  const result: SaveResult = await conn.tooling.sobject('DebugLevel').create(debugLevel);
   return {
     isSuccess: result.success,
     error: result.success ? undefined : result.errors[0].message,
