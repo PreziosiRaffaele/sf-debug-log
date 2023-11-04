@@ -1,9 +1,25 @@
+/* eslint-disable class-methods-use-this */
 import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Messages, Connection } from '@salesforce/core';
 import { createDebugLevel } from '../../utils';
 
 Messages.importMessagesDirectory(__dirname);
 const messages = Messages.loadMessages('sf-debug-log', 'debuglevel.new');
+
+const DEBUG_CATEGORIES = [
+  'Database',
+  'Workflow',
+  'Validation',
+  'Callout',
+  'ApexCode',
+  'ApexProfiling',
+  'Visualforce',
+  'System',
+  'Wave',
+  'Nba',
+];
+
+const DEBUG_LEVELS = ['NONE', 'INTERNAL', 'FINEST', 'FINER', 'FINE', 'DEBUG', 'INFO', 'WARN', 'ERROR'];
 
 export type DebuglevelNewResult = {
   isSuccess: boolean;
@@ -34,32 +50,14 @@ export default class DebuglevelNew extends SfCommand<DebuglevelNewResult> {
     }),
   };
 
-  public static categories = [
-    'Database',
-    'Workflow',
-    'Validation',
-    'Callout',
-    'ApexCode',
-    'ApexProfiling',
-    'Visualforce',
-    'System',
-    'Wave',
-    'Nba',
-  ];
-
-  public static levels = ['NONE', 'INTERNAL', 'FINEST', 'FINER', 'FINE', 'DEBUG', 'INFO', 'WARN', 'ERROR'];
-
   public async run(): Promise<DebuglevelNewResult> {
     const { flags } = await this.parse(DebuglevelNew);
     const conn: Connection = flags.targetusername.getConnection();
 
     try {
-      const debugLevel: DebugLevel = {
-        DeveloperName: flags.developername,
-        MasterLabel: flags.developername,
-      };
+      const debugLevel = this.createDebugLevelRecord(flags.developername);
 
-      for (const category of DebuglevelNew.categories) {
+      for (const category of DEBUG_CATEGORIES) {
         // eslint-disable-next-line no-await-in-loop
         const level = await this.selectDebugLevel(category);
         debugLevel[category] = level;
@@ -82,8 +80,15 @@ export default class DebuglevelNew extends SfCommand<DebuglevelNewResult> {
     }
   }
 
+  private createDebugLevelRecord(developerName: string): DebugLevel {
+    return {
+      DeveloperName: developerName,
+      MasterLabel: developerName,
+    };
+  }
+
   private async selectDebugLevel(category: string): Promise<string> {
-    const levels = DebuglevelNew.levels;
+    const levels = DEBUG_LEVELS;
     const level = await this.prompt<{ level: string }>({
       type: 'list',
       name: 'level',
