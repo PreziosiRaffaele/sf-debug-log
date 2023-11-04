@@ -17,6 +17,7 @@ sf plugins install sf-debug-log
 
 - [`sf trace new`](#sf-trace-new)
 - [`sf debug retrieve`](#sf-debug-retrieve)
+- [`sf debuglevel new`](#sf-debuglevel-new)
 
 ## `sf trace new`
 
@@ -63,4 +64,26 @@ DESCRIPTION
 
 EXAMPLES
   sf debug retrieve -o DeveloperEdition -u "Raffaele Preziosi" -t 10
+```
+
+## `sf debuglevel new`
+
+```
+USAGE
+  $ sf debuglevel new -o <value> [-n <value>]
+
+FLAGS
+  -o, --targetusername=<value>  [required] Username or alias of the target Salesforce org.
+  -n, --name=<value> [required] The developer name of the new DebugLevel.
+
+GLOBAL FLAGS
+  --json  Format output as json.
+
+DESCRIPTION
+  Create a new DebugLevel.
+
+  Create a new DebugLevel assigning level for each category.
+
+EXAMPLES
+  sf debuglevel new -o DeveloperEdition -n "DebugLevel"
 ```

@@ -4,7 +4,7 @@ Create a new DebugLevel.
 
 # description
 
-More information about a command. Don't repeat the summary.
+Create a new DebugLevel assigning level for each category.
 
 # flags.targetusername.summary
 
