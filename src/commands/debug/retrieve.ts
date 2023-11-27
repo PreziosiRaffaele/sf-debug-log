@@ -3,7 +3,7 @@ import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Connection, Messages } from '@salesforce/core';
 import { Record } from 'jsforce';
 import sanitize from 'sanitize-filename';
-import { getUserId, createFile } from '../../utils';
+import { getUserId, createFile, getLogs } from '../../utils';
 
 Messages.importMessagesDirectory(__dirname);
 const messages = Messages.loadMessages('sf-debug-log', 'debug.retrieve');
@@ -60,26 +60,6 @@ export default class Retrieve extends SfCommand<RetrieveResult> {
       throw messages.createError('error.saveLogs', [result.error]);
     }
   }
-}
-
-async function getLogs(conn: Connection, userId: string, time: number): Promise<Record[]> {
-  const dateTime = new Date(Date.now());
-  dateTime.setMinutes(dateTime.getMinutes() - time);
-
-  const startTime = dateTime.toISOString();
-  const queryResult = await conn.query(`SELECT Id, LogUser.Name, LogLength, Request, Operation,
-                                Application, Status, DurationMilliseconds,
-                                SystemModstamp, RequestIdentifier
-                                FROM ApexLog
-                                WHERE SystemModstamp > ${startTime}
-                                AND LogUserId = '${userId}'
-                                ORDER BY SystemModstamp DESC`);
-
-  if (queryResult.records.length === 0) {
-    throw new Error('No debug logs found');
-  }
-
-  return queryResult.records;
 }
 
 async function saveLogs(conn: Connection, logs: Record[], directory: string): Promise<void> {

@@ -92,3 +92,30 @@ export async function createDebugLevel(conn: Connection, debugLevel: Record): Pr
     error: result.success ? undefined : result.errors[0].message,
   };
 }
+
+export async function getLogs(conn: Connection, userId: string, time: number): Promise<Record[]> {
+  const dateTime = new Date(Date.now());
+  dateTime.setMinutes(dateTime.getMinutes() - time);
+
+  const startTime = dateTime.toISOString();
+  const queryResult = await conn.query(`SELECT Id, LogUser.Name, LogLength, Request, Operation,
+                                Application, Status, DurationMilliseconds,
+                                SystemModstamp, RequestIdentifier
+                                FROM ApexLog
+                                WHERE SystemModstamp > ${startTime}
+                                AND LogUserId = '${userId}'
+                                ORDER BY SystemModstamp DESC`);
+
+  if (queryResult.records.length === 0) {
+    throw new Error('No debug logs found');
+  }
+
+  return queryResult.records;
+}
+
+export async function deleteLogs(conn: Connection, logs: Record[]): Promise<void> {
+  if (logs && logs.length > 0) {
+    const ids = logs.map((log) => log.Id).filter((id): id is string => id !== undefined);
+    await conn.sobject('ApexLog').del(ids);
+  }
+}
