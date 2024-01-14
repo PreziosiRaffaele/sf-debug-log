@@ -29,8 +29,12 @@ export default class DebugDelete extends SfCommand<DebugDeleteResult> {
     time: Flags.integer({
       summary: messages.getMessage('flags.time.summary'),
       char: 't',
-      default: 60,
     }),
+    all: Flags.boolean({
+      summary: messages.getMessage('flags.all.summary'),
+      char: 'a',
+      default: false
+    })
   };
 
   public async run(): Promise<DebugDeleteResult> {
@@ -41,7 +45,7 @@ export default class DebugDelete extends SfCommand<DebugDeleteResult> {
       this.spinner.start('Deleting debug logs...');
       const user = flags.user ? flags.user : (conn.getUsername() as string);
       const userId = await getUserId(conn, user);
-      const logs: Record[] = await getLogs(conn, userId, flags.time);
+      const logs: Record[] = await getLogs(conn, userId, flags.time, flags.all);
       await deleteLogs(conn, logs);
       this.log(`${logs.length} logs deleted successfully`);
       this.spinner.stop();

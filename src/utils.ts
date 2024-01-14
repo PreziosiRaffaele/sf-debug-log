@@ -93,23 +93,34 @@ export async function createDebugLevel(conn: Connection, debugLevel: Record): Pr
   };
 }
 
-export async function getLogs(conn: Connection, userId: string, time: number): Promise<Record[]> {
-  const dateTime = new Date(Date.now());
-  dateTime.setMinutes(dateTime.getMinutes() - time);
+export async function getLogs(conn: Connection, userId: string, time: number, all: boolean): Promise<Record[]> {
+  let startTime;
+  if (time) {
+    const dateTime = new Date(Date.now());
+    dateTime.setMinutes(dateTime.getMinutes() - time);
+    startTime = dateTime.toISOString();
+  }
+  const LOG_FIELDS = ['Id', 'LogUser.Name', 'LogLength', 'Request', 'Operation', 'Application', 'Status', 'DurationMilliseconds', 'SystemModstamp', 'RequestIdentifier'];
+  let queryString = `SELECT ${LOG_FIELDS.join(',')} FROM ApexLog`;
 
-  const startTime = dateTime.toISOString();
-  const queryResult = await conn.query(`SELECT Id, LogUser.Name, LogLength, Request, Operation,
-                                Application, Status, DurationMilliseconds,
-                                SystemModstamp, RequestIdentifier
-                                FROM ApexLog
-                                WHERE SystemModstamp > ${startTime}
-                                AND LogUserId = '${userId}'
-                                ORDER BY SystemModstamp DESC`);
+  const whereConditions = [];
+  if (startTime) {
+    whereConditions.push(`SystemModstamp > ${startTime}`);
+  }
+  if (!all) {
+    whereConditions.push(`LogUserId = '${userId}'`);
+  }
 
+  if (whereConditions.length > 0) {
+    queryString += ` WHERE ${whereConditions.join(' AND ')}`;
+  }
+
+  queryString += ' ORDER BY SystemModstamp DESC';
+
+  const queryResult = await conn.query(queryString);
   if (queryResult.records.length === 0) {
     throw new Error('No debug logs found');
   }
-
   return queryResult.records;
 }
 
