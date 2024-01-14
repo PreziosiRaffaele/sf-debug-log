@@ -48,7 +48,7 @@ export default class Retrieve extends SfCommand<RetrieveResult> {
       this.spinner.start('Retriving debug logs...');
       const user = flags.user ? flags.user : (conn.getUsername() as string);
       const userId = await getUserId(conn, user);
-      const logs = await getLogs(conn, userId, flags.time);
+      const logs = await getLogs(conn, userId, flags.time, false);
       await saveLogs(conn, logs, flags.folder);
       this.spinner.stop();
       return { isSuccess: true };
