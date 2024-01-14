@@ -17,6 +17,7 @@ sf plugins install sf-debug-log
 
 - [`sf trace new`](#sf-trace-new)
 - [`sf debug retrieve`](#sf-debug-retrieve)
+- [`sf debug delete`](#sf-debuglevel-new)
 - [`sf debuglevel new`](#sf-debuglevel-new)
 
 ## `sf trace new`
@@ -64,6 +65,28 @@ DESCRIPTION
 
 EXAMPLES
   sf debug retrieve -o DeveloperEdition -u "Raffaele Preziosi" -t 10
+```
+
+## `sf debug delete`
+
+```
+USAGE
+  $  sf debug delete -o <value> [--json] [-u <value>] [-t <value>] [-a]
+
+FLAGS
+  -a, --all                     Delete log files for all users.
+  -o, --targetusername=<value>  (required) Username or alias of the target Salesforce org.
+  -t, --time=<value>            The number of minutes to retrieve log files for.
+  -u, --user=<value>            [default: targetusername] Username, Name, or ID of the user for whom you want to delete the logs.
+
+GLOBAL FLAGS
+  --json  Format output as json.
+
+DESCRIPTION
+  Delete Apex log files from a Salesforce org.
+
+EXAMPLES
+  sf debug delete -o DeveloperEdition -u "Raffaele Preziosi" -t 10
 ```
 
 ## `sf debuglevel new`
