@@ -93,7 +93,7 @@ export async function createDebugLevel(conn: Connection, debugLevel: Record): Pr
   };
 }
 
-export async function getLogs(conn: Connection, userId: string, time: number, all: boolean): Promise<Record[]> {
+export async function getLogs(conn: Connection, userId: string, time: number | undefined, all: boolean): Promise<Record[]> {
   let startTime;
   if (time) {
     const dateTime = new Date(Date.now());
