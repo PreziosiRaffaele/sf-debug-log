@@ -127,6 +127,6 @@ export async function getLogs(conn: Connection, userId: string, time: number | u
 export async function deleteLogs(conn: Connection, logs: Record[]): Promise<void> {
   if (logs && logs.length > 0) {
     const ids = logs.map((log) => log.Id).filter((id): id is string => id !== undefined);
-    await conn.sobject('ApexLog').del(ids);
+    await conn.sobject('ApexLog').del(ids, { allowRecursive: true });
   }
 }
