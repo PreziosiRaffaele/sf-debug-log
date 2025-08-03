@@ -1,9 +1,15 @@
 # sf-debug-log
 
-Commands to manage Salesforce debug logs.
+A Salesforce CLI plugin to make managing debug logs easier.
 
-Create trace flags for any user in the org selecting the debug level and time.
-Retrive Apex logs related to a specific user to analyze them locally.
+I built this because I found the official `sf` CLI was missing some commands I regularly need. For example, I wanted to put a specific user under debug and retrieve only their logs, delete logs more easily, or set a new debug level from the command line. This plugin adds those missing pieces and more to make debugging faster.
+
+## Features
+
+*   Create trace flags for any user in the org, selecting the debug level and time.
+*   List all debug levels in the org.
+*   Retrieve Apex logs for a specific user or all users in the org.
+*   Delete Apex logs for a specific user or all users in the org.
 
 ## Install
 
@@ -12,31 +18,30 @@ sf plugins install sf-debug-log
 ```
 
 ## Commands
-
 <!-- commands -->
-
 - [`sf trace new`](#sf-trace-new)
 - [`sf debug retrieve`](#sf-debug-retrieve)
-- [`sf debug delete`](#sf-debuglevel-new)
+- [`sf debug delete`](#sf-debug-delete)
+- [`sf debuglevel list`](#sf-debuglevel-list)
 - [`sf debuglevel new`](#sf-debuglevel-new)
 
 ## `sf trace new`
+
+Create a new trace flag.
 
 ```
 USAGE
   $ sf trace new -o <value> [-u <value>] [-t <value>]
 
 FLAGS
-  -o, --targetusername=<value>  [required] Username or alias of the target Salesforce org.
-  -t, --time=<value> [default: 60] The number of minutes to trace.
-  -u, --name=<value> [default: targetusername] Username, Name, or ID of the user for whom you want to retrieve the logs.
+  -o, --targetusername=<value>  (required) Username or alias of the target Salesforce org.
+  -t, --time=<value>            [default: 60] The number of minutes to trace.
+  -u, --name=<value>            Username, Name, or ID of the user for whom you want to retrieve the logs.
 
 GLOBAL FLAGS
   --json  Format output as json.
 
 DESCRIPTION
-  Create a new trace flag.
-
   This command is used to create a trace flag for a specific user in the Salesforce org.
 
 EXAMPLES
@@ -45,23 +50,21 @@ EXAMPLES
 
 ## `sf debug retrieve`
 
+Retrieve Apex log files from the Salesforce platform.
+
 ```
 USAGE
-  $  sf debug retrieve -o <value> [-u <value>] [-t <value>] [-d <value>]
+  $ sf debug retrieve -o <value> [-u <value>] [-t <value>] [-d <value>] [-a]
 
 FLAGS
+  -a, --all-users               Retrieve log files for all users.
   -d, --folder=<value>          [default: .sfdx/tools/debug/logs] The folder where the retrieved log files will be stored.
   -o, --targetusername=<value>  (required) Username or alias of the target Salesforce org.
-  -t, --time=<value>            [default: 60] The number of minutes to retrieve log files for.
-  -u, --user=<value>            [default: targetusername] Username, Name, or ID of the user for whom you want to retrieve the logs.
+  -t, --time=<value>            The number of minutes to retrieve log files for.
+  -u, --user=<value>            Username, Name, or ID of the user for whom you want to retrieve the logs.
 
 GLOBAL FLAGS
   --json  Format output as json.
-
-DESCRIPTION
-  Retrieve Apex log files from the Salesforce platform.
-
-  This command allows you to retrieve Apex log files from a Salesforce org.
 
 EXAMPLES
   sf debug retrieve -o DeveloperEdition -u "Raffaele Preziosi" -t 10
@@ -69,44 +72,84 @@ EXAMPLES
 
 ## `sf debug delete`
 
+Delete Apex log files from a Salesforce org.
+
 ```
 USAGE
-  $  sf debug delete -o <value> [--json] [-u <value>] [-t <value>] [-a]
+  $ sf debug delete -o <value> [--json] [-u <value>] [-t <value>] [-a]
 
 FLAGS
-  -a, --all                     Delete log files for all users.
+  -a, --all-users               Delete log files for all users.
   -o, --targetusername=<value>  (required) Username or alias of the target Salesforce org.
   -t, --time=<value>            The number of minutes to retrieve log files for.
-  -u, --user=<value>            [default: targetusername] Username, Name, or ID of the user for whom you want to delete the logs.
+  -u, --user=<value>            Username, Name, or ID of the user for whom you want to delete the logs.
 
 GLOBAL FLAGS
   --json  Format output as json.
-
-DESCRIPTION
-  Delete Apex log files from a Salesforce org.
 
 EXAMPLES
   sf debug delete -o DeveloperEdition -u "Raffaele Preziosi" -t 10
 ```
 
+## `sf debuglevel list`
+
+List all DebugLevels in the org.
+
+```
+USAGE
+  $ sf debuglevel list -o <value>
+
+FLAGS
+  -o, --targetusername=<value>  (required) Username or alias of the target Salesforce org.
+
+GLOBAL FLAGS
+  --json  Format output as json.
+
+EXAMPLES
+  sf debuglevel list -o DeveloperEdition
+```
+
 ## `sf debuglevel new`
+
+Create a new DebugLevel.
 
 ```
 USAGE
   $ sf debuglevel new -o <value> [-n <value>]
 
 FLAGS
-  -o, --targetusername=<value>  [required] Username or alias of the target Salesforce org.
-  -n, --name=<value> [required] The developer name of the new DebugLevel.
+  -n, --name=<value>            (required) The developer name of the new DebugLevel.
+  -o, --targetusername=<value>  (required) Username or alias of the target Salesforce org.
 
 GLOBAL FLAGS
   --json  Format output as json.
 
 DESCRIPTION
-  Create a new DebugLevel.
-
   Create a new DebugLevel assigning level for each category.
 
 EXAMPLES
   sf debuglevel new -o DeveloperEdition -n "DebugLevel"
+```
+
+## `sf trace new`
+
+Create a new trace flag.
+
+```
+USAGE
+  $ sf trace new -o <value> [-u <value>] [-t <value>]
+
+FLAGS
+  -o, --targetusername=<value>  (required) Username or alias of the target Salesforce org.
+  -t, --time=<value>            [default: 60] The number of minutes to trace.
+  -u, --name=<value>            Username, Name, or ID of the user for whom you want to retrieve the logs.
+
+GLOBAL FLAGS
+  --json  Format output as json.
+
+DESCRIPTION
+  This command is used to create a trace flag for a specific user in the Salesforce org.
+
+EXAMPLES
+  sf trace new -o DeveloperEdition -u "Raffaele Preziosi" -t 10
 ```
