@@ -26,6 +26,10 @@ The folder where the retrieved log files will be stored.
 
 Retrieve logs for all users in the org.
 
+# flags.api-version.summary
+
+API version to use. 
+
 # error.saveLogs
 
 Failed to save logs: %s.

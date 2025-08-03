@@ -26,6 +26,10 @@ Force the creation of the trace flag.
 
 The debug level for the trace flag.
 
+# flags.api-version.summary
+
+API version to use.
+
 # error.createTraceFlag
 
 Create User Trace Flag failed: %s.

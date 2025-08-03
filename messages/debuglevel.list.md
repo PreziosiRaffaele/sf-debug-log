@@ -10,6 +10,10 @@ List the debug levels in your org.
 
 Username or alias of the target Salesforce org.
 
+# flags.api-version.summary
+
+API version to use.
+
 # examples
 
 sf debuglevel list -o MyDeveloperEdition

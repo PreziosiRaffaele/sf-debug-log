@@ -11,7 +11,9 @@ export default class TraceNew extends SfCommand<void> {
   public static readonly examples = messages.getMessages('examples');
 
   public static readonly flags = {
-    'api-version': Flags.orgApiVersion(),
+    'api-version': Flags.orgApiVersion({
+      summary: messages.getMessage('flags.api-version.summary'),
+    }),
     targetusername: Flags.requiredOrg({
       summary: messages.getMessage('flags.targetusername.summary'),
       char: 'o',
