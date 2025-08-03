@@ -88,7 +88,7 @@
     "format": "wireit",
     "lint": "wireit",
     "postpack": "shx rm -f oclif.manifest.json",
-    "prepack": "sf-prepack",
+    "prepack": "wireit",
     "test": "wireit",
     "test:only": "wireit",
     "version": "oclif readme"
@@ -97,6 +97,11 @@
     "access": "public"
   },
   "wireit": {
+    "prepack": {
+      "dependencies": [
+        "build"
+      ]
+    },
     "build": {
       "dependencies": [
         "compile",

@@ -31,12 +31,14 @@ Create a new trace flag.
 
 ```
 USAGE
-  $ sf trace new -o <value> [-u <value>] [-t <value>]
+  $ sf trace new -o <value> -d <value> [-u <value>] [-t <value>] [-f]
 
 FLAGS
+  -d, --debuglevel=<value>      (required) The developer name of the DebugLevel to use for the trace.
+  -f, --force                   Force the creation of a new trace flag, even if one already exists for the user.
   -o, --targetusername=<value>  (required) Username or alias of the target Salesforce org.
   -t, --time=<value>            [default: 60] The number of minutes to trace.
-  -u, --name=<value>            Username, Name, or ID of the user for whom you want to retrieve the logs.
+  -u, --user=<value>            Username, Name, or ID of the user for whom you want to create the trace flag. If not specified, it will use the default username.
 
 GLOBAL FLAGS
   --json  Format output as json.
@@ -45,7 +47,7 @@ DESCRIPTION
   This command is used to create a trace flag for a specific user in the Salesforce org.
 
 EXAMPLES
-  sf trace new -o DeveloperEdition -u "Raffaele Preziosi" -t 10
+  sf trace new -o DeveloperEdition -u "Raffaele Preziosi" -t 10 -d "MyDebugLevel"
 ```
 
 ## `sf debug retrieve`
@@ -131,25 +133,4 @@ EXAMPLES
   sf debuglevel new -o DeveloperEdition -n "DebugLevel"
 ```
 
-## `sf trace new`
 
-Create a new trace flag.
-
-```
-USAGE
-  $ sf trace new -o <value> [-u <value>] [-t <value>]
-
-FLAGS
-  -o, --targetusername=<value>  (required) Username or alias of the target Salesforce org.
-  -t, --time=<value>            [default: 60] The number of minutes to trace.
-  -u, --name=<value>            Username, Name, or ID of the user for whom you want to retrieve the logs.
-
-GLOBAL FLAGS
-  --json  Format output as json.
-
-DESCRIPTION
-  This command is used to create a trace flag for a specific user in the Salesforce org.
-
-EXAMPLES
-  sf trace new -o DeveloperEdition -u "Raffaele Preziosi" -t 10
-```
