@@ -46,25 +46,19 @@ export default class DebuglevelNew extends SfCommand<void> {
   public async run(): Promise<void> {
     const { flags } = await this.parse(DebuglevelNew);
     const conn: Connection = flags.targetusername.getConnection(flags['api-version']);
+    const debugLevel = this.createDebugLevelRecord(flags.developername);
 
-    try {
-      const debugLevel = this.createDebugLevelRecord(flags.developername);
+    for (const category of DEBUG_CATEGORIES) {
+      // eslint-disable-next-line no-await-in-loop
+      const level = await this.selectDebugLevel(category);
+      debugLevel[category] = level;
+    }
 
-      for (const category of DEBUG_CATEGORIES) {
-        // eslint-disable-next-line no-await-in-loop
-        const level = await this.selectDebugLevel(category);
-        debugLevel[category] = level;
-      }
-
-      const result = await createDebugLevel(conn, debugLevel);
-      if (!result.isSuccess) {
-        this.error(`Error to create Debug Level: ${result.error}`);
-      } else {
-        this.log(`Debug Level ${flags.developername} created successfully.`);
-      }
-    } catch (exception) {
-      const err = exception instanceof Error ? exception.message : String(exception);
-      this.error(`Error to create Debug Level: ${err}`, { exit: 1 });
+    const result = await createDebugLevel(conn, debugLevel);
+    if (!result.isSuccess) {
+      this.error(`Error to create Debug Level: ${result.error}`);
+    } else {
+      this.log(`Debug Level ${flags.developername} created successfully.`);
     }
   }
 
