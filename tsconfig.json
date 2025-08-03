@@ -1,7 +1,6 @@
 {
-  "extends": "@salesforce/dev-config/tsconfig-strict",
+  "extends": "@salesforce/dev-config/tsconfig-strict-esm",
   "compilerOptions": {
-    "esModuleInterop": true,
     "outDir": "lib",
     "rootDir": "src"
   },

@@ -6,6 +6,10 @@ Delete Apex log files from a Salesforce org.
 
 Deletes Apex log files from a Salesforce org.
 
+# flags.api-version.summary
+
+API version to use.
+
 # flags.user.summary
 
 [default: targetusername] Username, Name, or ID of the user for whom you want to delete the logs.
@@ -16,11 +20,11 @@ Username or alias of the target Salesforce org.
 
 # flags.time.summary
 
-The number of minutes to retrieve log files for.
+The number of minutes to retrieve log to be deleted.
 
-# flags.all.summary
+# flags.all-users.summary
 
-Delete log files for all users.
+Retrieve logs for all users in the org.
 
 # error.deleteLogs
 

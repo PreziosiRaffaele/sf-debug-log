@@ -1,24 +1,20 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import path from 'path';
 import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Connection, Messages } from '@salesforce/core';
-import { Record } from 'jsforce';
-import sanitize from 'sanitize-filename';
-import { getUserId, createFile, getLogs } from '../../utils';
+import { getUserId, createFile, getLogs } from '../../utils.js';
 
-Messages.importMessagesDirectory(__dirname);
+Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 const messages = Messages.loadMessages('sf-debug-log', 'debug.retrieve');
 
-export type RetrieveResult = {
-  isSuccess: boolean;
-  error?: string;
-};
+import type { ApexLog, GetLogsOptions } from '../../types.js';
 
-export default class Retrieve extends SfCommand<RetrieveResult> {
+export default class Retrieve extends SfCommand<void> {
   public static readonly summary = messages.getMessage('summary');
   public static readonly description = messages.getMessage('description');
   public static readonly examples = messages.getMessages('examples');
 
   public static readonly flags = {
+    'api-version': Flags.orgApiVersion(),
     targetusername: Flags.requiredOrg({
       summary: messages.getMessage('flags.targetusername.summary'),
       char: 'o',
@@ -31,53 +27,55 @@ export default class Retrieve extends SfCommand<RetrieveResult> {
     time: Flags.integer({
       summary: messages.getMessage('flags.time.summary'),
       char: 't',
-      default: 60,
     }),
     folder: Flags.directory({
       summary: messages.getMessage('flags.folder.summary'),
       char: 'd',
       default: '.sfdx/tools/debug/logs',
     }),
+    'all-users': Flags.boolean({
+      summary: messages.getMessage('flags.all-users.summary'),
+      char: 'a',
+      default: false,
+    }),
   };
 
-  public async run(): Promise<RetrieveResult> {
+  public async run(): Promise<void> {
     const { flags } = await this.parse(Retrieve);
-    const conn: Connection = flags.targetusername.getConnection();
-    let result: RetrieveResult;
-    try {
-      this.spinner.start('Retriving debug logs...');
+    if (flags['all-users'] && flags.user) {
+      this.error('Cannot use --all-users and --user flags together');
+    }
+
+    const conn: Connection = flags.targetusername.getConnection(flags['api-version']);
+    const getLogsOptions: GetLogsOptions = {};
+
+    if (!flags['all-users']) {
+      // Default to the current user if no user is specified
       const user = flags.user ? flags.user : (conn.getUsername() as string);
       const userId = await getUserId(conn, user);
-      const logs = await getLogs(conn, userId, flags.time, false);
-      await saveLogs(conn, logs, flags.folder);
-      this.spinner.stop();
-      return { isSuccess: true };
-    } catch (err) {
-      result = {
-        isSuccess: false,
-        error: err instanceof Error ? err.message : String(err),
-      };
-      throw messages.createError('error.saveLogs', [result.error]);
+      if (!userId) {
+        this.error(`User ${user} not found`);
+      }
+      getLogsOptions.userId = userId;
     }
+
+    if (flags.time) {
+      getLogsOptions.timeLimit = flags.time;
+    }
+
+    const logs = await getLogs(conn, getLogsOptions);
+    await saveLogs(conn, logs, flags.folder);
+    this.log(`saved\t${logs.length}`);
   }
 }
 
-async function saveLogs(conn: Connection, logs: Record[], directory: string): Promise<void> {
+async function saveLogs(conn: Connection, logs: ApexLog[], directory: string): Promise<void> {
   // Use Promise.all to parallelize the download and save operations
   await Promise.all(
     logs.map(async (log) => {
       const url = `${conn.instanceUrl}/apexdebug/traceDownload.apexp?id=${log.Id}`;
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      const date = new Date(log.SystemModstamp);
-      const hours = date.getHours();
-      const minutes = date.getMinutes();
-      const seconds = date.getSeconds();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/restrict-template-expressions
-      const fileName = `(${hours}-${minutes}-${seconds}) ${log.DurationMilliseconds}ms ${log.Request} ${log.Operation} ${log.Status}.log`;
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      const sanitizedFileName = sanitize(fileName);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/restrict-template-expressions
-      const filePath = `${directory}/${log.LogUser.Name}/${sanitizedFileName}`;
+      const fileName = `${log.Id}.log`;
+      const filePath = path.join(directory, fileName);
       try {
         const body = await conn.request(url);
         await createFile(filePath, body as string);

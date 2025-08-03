@@ -22,6 +22,10 @@ The number of minutes to retrieve log files for.
 
 The folder where the retrieved log files will be stored.
 
+# flags.all-users.summary
+
+Retrieve logs for all users in the org.
+
 # error.saveLogs
 
 Failed to save logs: %s.

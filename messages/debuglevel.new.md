@@ -10,9 +10,21 @@ Create a new DebugLevel assigning level for each category.
 
 Username or alias of the target Salesforce org.
 
-# flags.developerName.summary
+# flags.developername.summary
 
 The developer name of the new DebugLevel.
+
+# flags.api-version.summary
+
+API version to use.
+
+# flags.force.summary
+
+Overwrite existing DebugLevel.
+
+# flags.debuglevel.summary
+
+The debug level to assign to each category.
 
 # examples
 

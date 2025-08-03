@@ -1,22 +1,21 @@
 import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
-import { Connection, Messages } from '@salesforce/core';
-import { Record } from 'jsforce';
-import { getUserId, getLogs, deleteLogs } from '../../utils';
+import { Messages, type Connection } from '@salesforce/core';
+import { getUserId, getLogs, deleteLogs } from '../../utils.js';
 
-Messages.importMessagesDirectory(__dirname);
+Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 const messages = Messages.loadMessages('sf-debug-log', 'debug.delete');
 
-export type DebugDeleteResult = {
-  isSuccess: boolean;
-  error?: string;
-};
+import type { ApexLog, GetLogsOptions } from '../../types.js';
 
-export default class DebugDelete extends SfCommand<DebugDeleteResult> {
+export default class DebugDelete extends SfCommand<void> {
   public static readonly summary = messages.getMessage('summary');
   public static readonly description = messages.getMessage('description');
   public static readonly examples = messages.getMessages('examples');
 
   public static readonly flags = {
+    'api-version': Flags.orgApiVersion({
+      summary: messages.getMessage('flags.api-version.summary'),
+    }),
     targetusername: Flags.requiredOrg({
       summary: messages.getMessage('flags.targetusername.summary'),
       char: 'o',
@@ -30,32 +29,37 @@ export default class DebugDelete extends SfCommand<DebugDeleteResult> {
       summary: messages.getMessage('flags.time.summary'),
       char: 't',
     }),
-    all: Flags.boolean({
-      summary: messages.getMessage('flags.all.summary'),
+    'all-users': Flags.boolean({
+      summary: messages.getMessage('flags.all-users.summary'),
       char: 'a',
-      default: false
-    })
+      default: false,
+    }),
   };
 
-  public async run(): Promise<DebugDeleteResult> {
+  public async run(): Promise<void> {
     const { flags } = await this.parse(DebugDelete);
-    const conn: Connection = flags.targetusername.getConnection();
-    let result: DebugDeleteResult;
-    try {
-      this.spinner.start('Deleting debug logs...');
+    if (flags['all-users'] && flags.user) {
+      this.error('Cannot use --all-users and --user flags together');
+    }
+
+    const conn: Connection = flags.targetusername.getConnection(flags['api-version']);
+    const getLogsOptions: GetLogsOptions = {};
+
+    if (!flags['all-users']) {
       const user = flags.user ? flags.user : (conn.getUsername() as string);
       const userId = await getUserId(conn, user);
-      const logs: Record[] = await getLogs(conn, userId, flags.time, flags.all);
-      await deleteLogs(conn, logs);
-      this.log(`${logs.length} logs deleted successfully`);
-      this.spinner.stop();
-      return { isSuccess: true };
-    } catch (err) {
-      result = {
-        isSuccess: false,
-        error: err instanceof Error ? err.message : String(err),
-      };
-      throw messages.createError('error.deleteLogs', [result.error]);
+      if (!userId) {
+        this.error(`User ${user} not found`);
+      }
+      getLogsOptions.userId = userId;
     }
+
+    if (flags.time) {
+      getLogsOptions.timeLimit = flags.time;
+    }
+
+    const logs: ApexLog[] = await getLogs(conn, getLogsOptions);
+    await deleteLogs(conn, logs);
+    this.log(`deleted\t${logs.length}`);
   }
 }

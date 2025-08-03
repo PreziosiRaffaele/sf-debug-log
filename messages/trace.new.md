@@ -18,6 +18,14 @@ Username or alias of the target Salesforce org.
 
 The time for the trace flag.
 
+# flags.force.summary
+
+Force the creation of the trace flag.
+
+# flags.debuglevel.summary
+
+The debug level for the trace flag.
+
 # error.createTraceFlag
 
 Create User Trace Flag failed: %s.
