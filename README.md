@@ -34,11 +34,11 @@ USAGE
   $ sf trace new -o <value> -d <value> [-u <value>] [-t <value>] [-f]
 
 FLAGS
-  -d, --debuglevel=<value>      (required) The developer name of the DebugLevel to use for the trace.
+  -d, --debuglevel=<value>      [default: SFDC_DevConsole] The debug level for the trace flag.
   -f, --force                   Force the creation of a new trace flag, even if one already exists for the user.
   -o, --targetusername=<value>  (required) Username or alias of the target Salesforce org.
   -t, --time=<value>            [default: 60] The number of minutes to trace.
-  -u, --user=<value>            Username, Name, or ID of the user for whom you want to create the trace flag. If not specified, it will use the default username.
+  -u, --user=<value>            [default: current user] Username, Name, or ID of the user for whom you want to retrieve the logs.
 
 GLOBAL FLAGS
   --json  Format output as json.
@@ -63,7 +63,7 @@ FLAGS
   -d, --folder=<value>          [default: .sfdx/tools/debug/logs] The folder where the retrieved log files will be stored.
   -o, --targetusername=<value>  (required) Username or alias of the target Salesforce org.
   -t, --time=<value>            The number of minutes to retrieve log files for.
-  -u, --user=<value>            Username, Name, or ID of the user for whom you want to retrieve the logs.
+  -u, --user=<value>            [default: current user] Username, Name, or ID of the user for whom you want to retrieve the logs.
 
 GLOBAL FLAGS
   --json  Format output as json.
@@ -84,7 +84,7 @@ FLAGS
   -a, --all-users               Delete log files for all users.
   -o, --targetusername=<value>  (required) Username or alias of the target Salesforce org.
   -t, --time=<value>            The number of minutes to retrieve log files for.
-  -u, --user=<value>            Username, Name, or ID of the user for whom you want to delete the logs.
+  -u, --user=<value>            [default: current user] Username, Name, or ID of the user for whom you want to retrieve the logs.
 
 GLOBAL FLAGS
   --json  Format output as json.
