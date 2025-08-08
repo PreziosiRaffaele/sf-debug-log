@@ -36,7 +36,7 @@ export default class TraceNew extends SfCommand<void> {
     debuglevel: Flags.string({
       summary: messages.getMessage('flags.debuglevel.summary'),
       char: 'd',
-      required: true,
+      default: 'SFDC_DevConsole',
     }),
   };
 
