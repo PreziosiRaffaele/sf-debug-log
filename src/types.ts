@@ -6,6 +6,7 @@ export type SaveResult = {
 export interface GetLogsOptions {
   userId?: string | null;
   timeLimit?: number | null;
+  limit?: number | null;
 }
 
 export type ApexLog = {

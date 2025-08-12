@@ -30,6 +30,11 @@ export default class Retrieve extends SfCommand<void> {
       summary: messages.getMessage('flags.time.summary'),
       char: 't',
     }),
+    limit: Flags.integer({
+      summary: messages.getMessage('flags.limit.summary'),
+      char: 'l',
+      default: 100
+    }),
     folder: Flags.directory({
       summary: messages.getMessage('flags.folder.summary'),
       char: 'd',
@@ -65,25 +70,32 @@ export default class Retrieve extends SfCommand<void> {
       getLogsOptions.timeLimit = flags.time;
     }
 
+    if (flags.limit) {
+      getLogsOptions.limit = flags.limit;
+    }
+
     const logs = await getLogs(conn, getLogsOptions);
-    await saveLogs(conn, logs, flags.folder);
+    await this.saveLogs(conn, logs, flags.folder);
     this.log(`saved\t${logs.length}`);
+  }
+
+  private async saveLogs(conn: Connection, logs: ApexLog[], directory: string): Promise<void> {
+    // Use Promise.all to parallelize the download and save operations
+    await Promise.all(
+      logs.map(async (log) => {
+        const url = `${conn.instanceUrl}/apexdebug/traceDownload.apexp?id=${log.Id}`;
+        const fileName = `${log.Id}.log`;
+        const filePath = path.join(directory, fileName);
+        try {
+          const body = await conn.request(url);
+          await createFile(filePath, body as string);
+        } catch (err) {
+          const errorMessage = err instanceof Error ? err.message : '';
+          this.warn(`Error downloading log for ${log.Id}: ${errorMessage}`);
+        }
+      })
+    );
   }
 }
 
-async function saveLogs(conn: Connection, logs: ApexLog[], directory: string): Promise<void> {
-  // Use Promise.all to parallelize the download and save operations
-  await Promise.all(
-    logs.map(async (log) => {
-      const url = `${conn.instanceUrl}/apexdebug/traceDownload.apexp?id=${log.Id}`;
-      const fileName = `${log.Id}.log`;
-      const filePath = path.join(directory, fileName);
-      try {
-        const body = await conn.request(url);
-        await createFile(filePath, body as string);
-      } catch (err) {
-        throw new Error('Error saving debug logs');
-      }
-    })
-  );
-}
+

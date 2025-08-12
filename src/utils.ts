@@ -130,6 +130,10 @@ export async function getLogs(conn: Connection, options: GetLogsOptions): Promis
 
   queryString += ' ORDER BY SystemModstamp DESC';
 
+  if (options.limit) {
+    queryString += ` LIMIT ${options.limit.toString()}`;
+  }
+
   const queryResult = await conn.query(queryString);
 
   return queryResult.records as ApexLog[];

@@ -18,6 +18,10 @@ Username or alias of the target Salesforce org.
 
 The number of minutes to retrieve log files for.
 
+# flags.limit.summary
+
+The max number of log files to retrieve.
+
 # flags.folder.summary
 
 The folder where the retrieved log files will be stored.
