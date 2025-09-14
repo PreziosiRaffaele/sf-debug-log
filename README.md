@@ -62,6 +62,7 @@ FLAGS
   -a, --all-users               Retrieve log files for all users.
   -d, --folder=<value>          [default: .sfdx/tools/debug/logs] The folder where the retrieved log files will be stored.
   -o, --targetusername=<value>  (required) Username or alias of the target Salesforce org.
+  -l, --limit=<value>           [default: 100] The max number of log files to retrieve.
   -t, --time=<value>            The number of minutes to retrieve log files for.
   -u, --user=<value>            [default: current user] Username, Name, or ID of the user for whom you want to retrieve the logs.
 
