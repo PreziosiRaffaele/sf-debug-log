@@ -5,7 +5,22 @@ import { getDebugLevels } from '../../utils.js';
 Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 const messages = Messages.loadMessages('sf-debug-log', 'debuglevel.list');
 
-export default class List extends SfCommand<void> {
+type ListResult = { data: DebugLevelRow[] };
+type DebugLevelRow = {
+  DeveloperName: string;
+  Workflow: string;
+  Validation: string;
+  Callout: string;
+  ApexCode: string;
+  ApexProfiling: string;
+  Visualforce: string;
+  System: string;
+  Database: string;
+  Wave: string;
+  Nba: string;
+};
+
+export default class List extends SfCommand<ListResult> {
   public static readonly summary = messages.getMessage('summary');
   public static readonly description = messages.getMessage('description');
   public static readonly examples = messages.getMessages('examples');
@@ -21,7 +36,7 @@ export default class List extends SfCommand<void> {
     }),
   };
 
-  public async run(): Promise<void> {
+  public async run(): Promise<ListResult> {
     const { flags } = await this.parse(List);
     const conn: Connection = flags.targetusername.getConnection(flags['api-version']);
     const debugLevels = await getDebugLevels(conn);
@@ -39,6 +54,7 @@ export default class List extends SfCommand<void> {
       Nba: level.Nba
     }));
     this.table({ data });
+    return { data };
   }
 }
 
