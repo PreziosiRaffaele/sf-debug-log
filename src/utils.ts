@@ -111,12 +111,15 @@ export async function getLogs(conn: Connection, options: GetLogsOptions): Promis
 
   const whereConditions = [];
 
-  if (options.timeLimit) {
+  const minutes = options.timeLimit ?? options.timeOlderThan;
+  if (minutes) {
     const dateTime = new Date(Date.now());
-    dateTime.setMinutes(dateTime.getMinutes() - options.timeLimit);
+    dateTime.setMinutes(dateTime.getMinutes() - minutes);
     const startTime = dateTime.toISOString();
-    if (startTime) {
+    if (options.timeLimit != null) {
       whereConditions.push(`SystemModstamp > ${startTime}`);
+    } else {
+      whereConditions.push(`SystemModstamp < ${startTime}`);
     }
   }
 

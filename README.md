@@ -84,7 +84,7 @@ USAGE
 FLAGS
   -a, --all-users               Delete log files for all users.
   -o, --targetusername=<value>  (required) Username or alias of the target Salesforce org.
-  -t, --time=<value>            The number of minutes to retrieve log files for.
+  -t, --time=<value>            Delete logs older than the specified number of minutes.
   -u, --user=<value>            [default: current user] Username, Name, or ID of the user for whom you want to retrieve the logs.
 
 GLOBAL FLAGS

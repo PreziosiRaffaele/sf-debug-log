@@ -55,7 +55,7 @@ export default class DebugDelete extends SfCommand<void> {
     }
 
     if (flags.time) {
-      getLogsOptions.timeLimit = flags.time;
+      getLogsOptions.timeOlderThan = flags.time;
     }
 
     const logs: ApexLog[] = await getLogs(conn, getLogsOptions);

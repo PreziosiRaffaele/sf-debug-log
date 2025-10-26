@@ -16,7 +16,7 @@ Username or alias of the target Salesforce org.
 
 # flags.time.summary
 
-The number of minutes to retrieve log files for.
+Retrieve logs created in the last specified number of minutes.
 
 # flags.limit.summary
 

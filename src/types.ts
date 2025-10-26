@@ -7,6 +7,7 @@ export interface GetLogsOptions {
   userId?: string | null;
   timeLimit?: number | null;
   limit?: number | null;
+  timeOlderThan?: number | null;
 }
 
 export type ApexLog = {
