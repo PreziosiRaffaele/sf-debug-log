@@ -52,17 +52,20 @@ EXAMPLES
 
 ## `sf debug retrieve`
 
-Retrieve Apex log files from the Salesforce platform.
+Retrieve Apex log files from the Salesforce platform. If `--folder` is omitted, the selected log contents are streamed to stdout.
 
 ```
 USAGE
-  $ sf debug retrieve -o <value> [-u <value>] [-t <value>] [-d <value>] [-a]
+  $ sf debug retrieve -o <value> [-u <value>] [-t <value>] [-l <value>] [-q <value>] [-d <value>] [-a]
 
 FLAGS
   -a, --all-users               Retrieve log files for all users.
-  -d, --folder=<value>          [default: .sfdx/tools/debug/logs] The folder where the retrieved log files will be stored.
+  -d, --folder=<value>          The folder where the retrieved log files will be stored. If omitted, the selected logs
+                                are streamed to stdout.
   -o, --targetusername=<value>  (required) Username or alias of the target Salesforce org.
   -l, --limit=<value>           [default: 100] The max number of log files to retrieve.
+  -q, --query=<value>           SOQL query used to select ApexLog records to retrieve. This flag can't be used with
+                                --user, --time, --limit, or --all-users.
   -t, --time=<value>            The number of minutes to retrieve log files for.
   -u, --user=<value>            [default: current user] Username, Name, or ID of the user for whom you want to retrieve the logs.
 
@@ -71,6 +74,8 @@ GLOBAL FLAGS
 
 EXAMPLES
   sf debug retrieve -o DeveloperEdition -u "Raffaele Preziosi" -t 10
+
+  sf debug retrieve -o DeveloperEdition -q "SELECT Id FROM ApexLog ORDER BY SystemModstamp DESC LIMIT 1" | rg "EXCEPTION"
 ```
 
 ## `sf debug delete`

@@ -142,6 +142,21 @@ export async function getLogs(conn: Connection, options: GetLogsOptions): Promis
   return queryResult.records as ApexLog[];
 }
 
+export async function getLogsByQuery(conn: Connection, query: string): Promise<ApexLog[]> {
+  if (!/\bfrom\s+apexlog\b/i.test(query)) {
+    throw new Error('The --query SOQL must query ApexLog records.');
+  }
+
+  const queryResult = await conn.query(query);
+  const logs = queryResult.records as ApexLog[];
+
+  if (logs.some((log) => !log.Id)) {
+    throw new Error('The --query SOQL must select the ApexLog Id field.');
+  }
+
+  return logs;
+}
+
 export async function deleteLogs(conn: Connection, logs: ApexLog[]): Promise<void> {
   if (logs && logs.length > 0) {
     const ids = logs.map((log) => log.Id).filter((id): id is string => id !== undefined);

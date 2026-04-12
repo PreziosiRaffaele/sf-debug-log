@@ -12,8 +12,8 @@ export interface GetLogsOptions {
 
 export type ApexLog = {
   Id: string;
-  LogUser: {
-    Username: string;
+  LogUser?: {
+    Username?: string;
   };
 };
 
