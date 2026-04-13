@@ -4,7 +4,7 @@ Retrieve Apex log files from the Salesforce platform.
 
 # description
 
-This command allows you to retrieve Apex log files from a Salesforce org. If you don't specify `--folder`, the log contents are streamed to stdout.
+This command allows you to retrieve Apex log files from a Salesforce org. If you don't specify `--folder`, the selected logs are streamed to stdout either as raw text or as NDJSON.
 
 # flags.user.summary
 
@@ -30,6 +30,10 @@ SOQL query used to select `ApexLog` records to retrieve. This flag can't be used
 
 The folder where the retrieved log files will be stored. If omitted, the selected logs are streamed to stdout.
 
+# flags.output-format.summary
+
+How to write logs to stdout when `--folder` is omitted. Use `text` for raw log content or `ndjson` for one JSON object per log.
+
 # flags.all-users.summary
 
 Retrieve logs for all users in the org.
@@ -46,3 +50,4 @@ Failed to save logs: %s.
 
 sf debug retrieve -o MyDeveloperEdition -u "Raffaele Preziosi" -t 10
 sf debug retrieve -o MyDeveloperEdition -q "SELECT Id FROM ApexLog ORDER BY SystemModstamp DESC LIMIT 1" | rg "EXCEPTION"
+sf debug retrieve -o MyDeveloperEdition -q "SELECT Id FROM ApexLog ORDER BY SystemModstamp DESC LIMIT 1" --output-format ndjson

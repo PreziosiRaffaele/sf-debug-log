@@ -2,6 +2,7 @@ import { createWriteStream } from 'node:fs';
 import { mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import { pipeline as nodePipeline, Writable } from 'node:stream';
+import { StringDecoder } from 'node:string_decoder';
 import { promisify } from 'node:util';
 import type { Interfaces } from '@oclif/core';
 import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
@@ -16,6 +17,13 @@ import type { ApexLog, GetLogsOptions } from '../../types.js';
 const pipeline = promisify(nodePipeline);
 const QUERY_EXCLUSIVE_FLAGS = ['user', 'time', 'limit', 'all-users'];
 const EMPTY_DOWNLOAD_SUMMARY: DownloadSummary = { failedCount: 0, savedCount: 0 };
+const OUTPUT_FORMATS = ['text', 'ndjson'] as const;
+
+class PartialNdjsonStreamError extends Error {
+  public constructor(message: string, public readonly cause: unknown) {
+    super(message);
+  }
+}
 
 export default class Retrieve extends SfCommand<void> {
   public static readonly summary = messages.getMessage('summary');
@@ -54,6 +62,11 @@ export default class Retrieve extends SfCommand<void> {
       summary: messages.getMessage('flags.folder.summary'),
       char: 'd',
     }),
+    'output-format': Flags.string({
+      summary: messages.getMessage('flags.output-format.summary'),
+      options: [...OUTPUT_FORMATS],
+      default: 'text',
+    }),
     'all-users': Flags.boolean({
       summary: messages.getMessage('flags.all-users.summary'),
       char: 'a',
@@ -84,14 +97,113 @@ export default class Retrieve extends SfCommand<void> {
     });
   }
 
+  private static createNdjsonWriter(logId: string): NdjsonWriter {
+    const decoder = new StringDecoder('utf8');
+    let started = false;
+    let completed = false;
+    const writer = new Writable({
+      write(chunk: string | Uint8Array, _encoding: BufferEncoding, callback: (error?: Error | null) => void): void {
+        const chunkBuffer = typeof chunk === 'string' ? Buffer.from(chunk) : chunk;
+        const decoded = decoder.write(chunkBuffer);
+
+        if (!started && decoded.length > 0) {
+          startRecord();
+        }
+
+        if (decoded.length === 0) {
+          callback();
+          return;
+        }
+
+        process.stdout.write(Retrieve.escapeJsonString(decoded), callback);
+      },
+      final(callback: (error?: Error | null) => void): void {
+        const remaining = decoder.end();
+
+        if (!started && remaining.length > 0) {
+          startRecord();
+        }
+
+        if (remaining.length > 0) {
+          process.stdout.write(Retrieve.escapeJsonString(remaining), (error?: Error | null) => {
+            if (error) {
+              callback(error);
+              return;
+            }
+
+            endRecord(callback);
+          });
+          return;
+        }
+
+        endRecord(callback);
+      },
+    }) as NdjsonWriter;
+
+    const startRecord = (): void => {
+      if (!started) {
+        started = true;
+        writer.started = true;
+        process.stdout.write(`{"logId":${JSON.stringify(logId)},"log":"`);
+      }
+    };
+
+    const endRecord = (callback: (error?: Error | null) => void): void => {
+      if (!started) {
+        startRecord();
+      }
+
+      if (!completed) {
+        completed = true;
+        process.stdout.write('"}\n', callback);
+        return;
+      }
+
+      callback();
+    };
+
+    writer.started = false;
+    return writer;
+  }
+
+  private static escapeJsonString(value: string): string {
+    return JSON.stringify(value).slice(1, -1);
+  }
+
+  private static async streamLog(conn: Connection, log: ApexLog, outputFormat: OutputFormat): Promise<void> {
+    const request = conn.request<string>(Retrieve.getDownloadUrl(conn, log));
+    const destination =
+      outputFormat === 'ndjson' ? Retrieve.createNdjsonWriter(log.Id) : Retrieve.createStdoutWriter();
+
+    try {
+      await Promise.all([pipeline(request.stream(), destination), request.then(() => undefined)]);
+    } catch (err) {
+      if (outputFormat === 'ndjson' && (destination as NdjsonWriter).started) {
+        throw new PartialNdjsonStreamError(`NDJSON stream failed after output started for ${log.Id}`, err);
+      }
+
+      throw err;
+    }
+  }
+
   public async run(): Promise<void> {
     const { flags: parsedFlags } = await this.parse(Retrieve);
     const flags = parsedFlags as RetrieveFlags;
+    const outputFormat = flags['output-format'] as OutputFormat;
+
+    if (outputFormat === 'ndjson' && flags.folder) {
+      this.error('Cannot use --output-format ndjson with --folder.');
+    }
+
+    if (outputFormat === 'ndjson' && flags.json) {
+      this.error('Cannot use --output-format ndjson with --json.');
+    }
+
     const conn: Connection = flags.targetusername.getConnection(flags['api-version']);
     const logs = flags.query ? await getLogsByQuery(conn, flags.query) : await this.getLogsFromFlags(conn, flags);
     const downloadSummary = flags.folder
       ? await this.saveLogs(conn, logs, flags.folder)
-      : await this.streamLogsToStdout(conn, logs);
+      : await this.streamLogsToStdout(conn, logs, outputFormat);
 
     if (downloadSummary.failedCount > 0) {
       const label = downloadSummary.failedCount === 1 ? 'log' : 'logs';
@@ -155,17 +267,25 @@ export default class Retrieve extends SfCommand<void> {
     );
   }
 
-  private async streamLogsToStdout(conn: Connection, logs: ApexLog[]): Promise<DownloadSummary> {
+  private async streamLogsToStdout(
+    conn: Connection,
+    logs: ApexLog[],
+    outputFormat: OutputFormat
+  ): Promise<DownloadSummary> {
     return logs.reduce<Promise<DownloadSummary>>(async (summaryPromise, log) => {
       const summary = await summaryPromise;
 
       try {
-        await Retrieve.pipeLog(conn, log, Retrieve.createStdoutWriter());
+        await Retrieve.streamLog(conn, log, outputFormat);
         return {
           failedCount: summary.failedCount,
           savedCount: summary.savedCount + 1,
         };
       } catch (err) {
+        if (err instanceof PartialNdjsonStreamError) {
+          throw err;
+        }
+
         this.warnDownloadError(log, err);
         return {
           failedCount: summary.failedCount + 1,
@@ -183,5 +303,5 @@ export default class Retrieve extends SfCommand<void> {
 
 type RetrieveFlags = Interfaces.InferredFlags<typeof Retrieve.flags>;
 type DownloadSummary = { failedCount: number; savedCount: number };
-
-
+type OutputFormat = (typeof OUTPUT_FORMATS)[number];
+type NdjsonWriter = Writable & { started: boolean };

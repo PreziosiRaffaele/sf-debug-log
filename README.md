@@ -52,11 +52,11 @@ EXAMPLES
 
 ## `sf debug retrieve`
 
-Retrieve Apex log files from the Salesforce platform. If `--folder` is omitted, the selected log contents are streamed to stdout.
+Retrieve Apex log files from the Salesforce platform. If `--folder` is omitted, the selected logs are streamed to stdout either as raw text or as NDJSON.
 
 ```
 USAGE
-  $ sf debug retrieve -o <value> [-u <value>] [-t <value>] [-l <value>] [-q <value>] [-d <value>] [-a]
+  $ sf debug retrieve -o <value> [-u <value>] [-t <value>] [-l <value>] [-q <value>] [-d <value>] [--output-format text|ndjson] [-a]
 
 FLAGS
   -a, --all-users               Retrieve log files for all users.
@@ -64,6 +64,9 @@ FLAGS
                                 are streamed to stdout.
   -o, --targetusername=<value>  (required) Username or alias of the target Salesforce org.
   -l, --limit=<value>           [default: 100] The max number of log files to retrieve.
+  --output-format=<option>      [default: text] How to write logs to stdout when --folder is omitted. Use text for raw
+                                log content or ndjson for one JSON object per log.
+                                <options: text|ndjson>
   -q, --query=<value>           SOQL query used to select ApexLog records to retrieve. This flag can't be used with
                                 --user, --time, --limit, or --all-users.
   -t, --time=<value>            The number of minutes to retrieve log files for.
@@ -76,6 +79,8 @@ EXAMPLES
   sf debug retrieve -o DeveloperEdition -u "Raffaele Preziosi" -t 10
 
   sf debug retrieve -o DeveloperEdition -q "SELECT Id FROM ApexLog ORDER BY SystemModstamp DESC LIMIT 1" | rg "EXCEPTION"
+
+  sf debug retrieve -o DeveloperEdition -q "SELECT Id FROM ApexLog ORDER BY SystemModstamp DESC LIMIT 1" --output-format ndjson
 ```
 
 ## `sf debug delete`
@@ -138,5 +143,4 @@ DESCRIPTION
 EXAMPLES
   sf debuglevel new -o DeveloperEdition -n "DebugLevel"
 ```
-
 
