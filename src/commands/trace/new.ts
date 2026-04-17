@@ -1,5 +1,6 @@
 import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Connection, Messages } from '@salesforce/core';
+import { select } from '@inquirer/prompts';
 import { getUserId, getActiveTraceFlag, createTraceFlag, getDebugLevels } from '../../utils.js';
 import type { DebugLevel } from '../../types.js';
 
@@ -36,9 +37,20 @@ export default class TraceNew extends SfCommand<void> {
     debuglevel: Flags.string({
       summary: messages.getMessage('flags.debuglevel.summary'),
       char: 'd',
-      default: 'SFDC_DevConsole',
     }),
   };
+
+  private static async selectDebugLevel(debugLevels: DebugLevel[]): Promise<string> {
+    return select({
+      message: 'Select Debug Level',
+      loop: false,
+      choices: debugLevels.map((debugLevel) => ({
+        name: `${debugLevel.DeveloperName} (DB:${debugLevel.Database} Callout:${debugLevel.Callout} APEX:${debugLevel.ApexCode} Validation:${debugLevel.Validation} Workflow:${debugLevel.Workflow} Profiling:${debugLevel.ApexProfiling} VF:${debugLevel.Visualforce} System:${debugLevel.System} Wave:${debugLevel.Wave} Nba:${debugLevel.Nba})`,
+        value: debugLevel.Id,
+        description: debugLevel.DeveloperName,
+      })),
+    });
+  }
 
   public async run(): Promise<void> {
     const { flags } = await this.parse(TraceNew);
@@ -58,7 +70,9 @@ export default class TraceNew extends SfCommand<void> {
       }
     }
     const debugLevels: DebugLevel[] = await getDebugLevels(conn);
-    const debugLevelId = debugLevels.find((level) => level.DeveloperName === flags.debuglevel)?.Id;
+    const debugLevelId = flags.debuglevel
+      ? debugLevels.find((level) => level.DeveloperName === flags.debuglevel)?.Id
+      : await TraceNew.selectDebugLevel(debugLevels);
     if (!debugLevelId) {
       this.error(`Debug Level ${flags.debuglevel} not found`);
     }
