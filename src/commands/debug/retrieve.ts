@@ -7,7 +7,7 @@ import { promisify } from 'node:util';
 import type { Interfaces } from '@oclif/core';
 import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Connection, Messages } from '@salesforce/core';
-import { getUserId, getLogs, getLogsByQuery } from '../../utils.js';
+import { getUserId, getLogs } from '../../utils.js';
 
 Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 const messages = Messages.loadMessages('sf-debug-log', 'debug.retrieve');
@@ -15,7 +15,7 @@ const messages = Messages.loadMessages('sf-debug-log', 'debug.retrieve');
 import type { ApexLog, GetLogsOptions } from '../../types.js';
 
 const pipeline = promisify(nodePipeline);
-const QUERY_EXCLUSIVE_FLAGS = ['user', 'time', 'limit', 'all-users'];
+const WHERE_EXCLUSIVE_FLAGS = ['user', 'time', 'all-users'];
 const EMPTY_DOWNLOAD_SUMMARY: DownloadSummary = { failedCount: 0, savedCount: 0 };
 const OUTPUT_FORMATS = ['text', 'ndjson'] as const;
 
@@ -53,10 +53,10 @@ export default class Retrieve extends SfCommand<void> {
       char: 'l',
       default: 100,
     }),
-    query: Flags.string({
-      summary: messages.getMessage('flags.query.summary'),
-      char: 'q',
-      exclusive: QUERY_EXCLUSIVE_FLAGS,
+    where: Flags.string({
+      summary: messages.getMessage('flags.where.summary'),
+      char: 'w',
+      exclusive: WHERE_EXCLUSIVE_FLAGS,
     }),
     folder: Flags.directory({
       summary: messages.getMessage('flags.folder.summary'),
@@ -97,10 +97,18 @@ export default class Retrieve extends SfCommand<void> {
     });
   }
 
-  private static createNdjsonWriter(logId: string): NdjsonWriter {
+  private static createNdjsonWriter(log: ApexLog): NdjsonWriter {
     const decoder = new StringDecoder('utf8');
     let started = false;
     let completed = false;
+    const recordPrefix = JSON.stringify({
+      Id: log.Id,
+      Request: log.Request ?? null,
+      Operation: log.Operation ?? null,
+      LastModifiedDate: log.LastModifiedDate ?? null,
+      Status: log.Status ?? null,
+      Log: '',
+    }).slice(0, -2);
     const writer = new Writable({
       write(chunk: string | Uint8Array, _encoding: BufferEncoding, callback: (error?: Error | null) => void): void {
         const chunkBuffer = typeof chunk === 'string' ? Buffer.from(chunk) : chunk;
@@ -144,7 +152,7 @@ export default class Retrieve extends SfCommand<void> {
       if (!started) {
         started = true;
         writer.started = true;
-        process.stdout.write(`{"logId":${JSON.stringify(logId)},"log":"`);
+        process.stdout.write(recordPrefix);
       }
     };
 
@@ -173,7 +181,7 @@ export default class Retrieve extends SfCommand<void> {
   private static async streamLog(conn: Connection, log: ApexLog, outputFormat: OutputFormat): Promise<void> {
     const request = conn.request<string>(Retrieve.getDownloadUrl(conn, log));
     const destination =
-      outputFormat === 'ndjson' ? Retrieve.createNdjsonWriter(log.Id) : Retrieve.createStdoutWriter();
+      outputFormat === 'ndjson' ? Retrieve.createNdjsonWriter(log) : Retrieve.createStdoutWriter();
 
     try {
       await Promise.all([pipeline(request.stream(), destination), request.then(() => undefined)]);
@@ -200,7 +208,7 @@ export default class Retrieve extends SfCommand<void> {
     }
 
     const conn: Connection = flags.targetusername.getConnection(flags['api-version']);
-    const logs = flags.query ? await getLogsByQuery(conn, flags.query) : await this.getLogsFromFlags(conn, flags);
+    const logs = await this.getLogsFromFlags(conn, flags);
     const downloadSummary = flags.folder
       ? await this.saveLogs(conn, logs, flags.folder)
       : await this.streamLogsToStdout(conn, logs, outputFormat);
@@ -217,11 +225,11 @@ export default class Retrieve extends SfCommand<void> {
 
   private async getLogsFromFlags(
     conn: Connection,
-    flags: Pick<RetrieveFlags, 'user' | 'time' | 'limit' | 'all-users'>
+    flags: Pick<RetrieveFlags, 'user' | 'time' | 'limit' | 'all-users' | 'where'>
   ): Promise<ApexLog[]> {
     const getLogsOptions: GetLogsOptions = {};
 
-    if (!flags['all-users']) {
+    if (!flags['all-users'] && flags.where === undefined) {
       const user = flags.user ?? (conn.getUsername() as string);
       const userId = await getUserId(conn, user);
       if (!userId) {
@@ -237,6 +245,10 @@ export default class Retrieve extends SfCommand<void> {
 
     if (flags.limit !== undefined) {
       getLogsOptions.limit = flags.limit;
+    }
+
+    if (flags.where !== undefined) {
+      getLogsOptions.whereClause = flags.where;
     }
 
     return getLogs(conn, getLogsOptions);

@@ -66,7 +66,7 @@ Retrieve Apex log files from the Salesforce platform.
 
 ```
 USAGE
-  $ sf debug retrieve -o <value> [--json] [--flags-dir <value>] [--api-version <value>] [-q <value> | [-u <value> |
+  $ sf debug retrieve -o <value> [--json] [--flags-dir <value>] [--api-version <value>] [-w <value> | [-u <value> |
     -a] | -t <value> | -l <value> | ] [-d <value>] [--output-format text|ndjson]
 
 FLAGS
@@ -75,8 +75,8 @@ FLAGS
                                 are streamed to stdout.
   -l, --limit=<value>           [default: 100] The max number of log files to retrieve.
   -o, --targetusername=<value>  (required) Username or alias of the target Salesforce org.
-  -q, --query=<value>           SOQL query used to select `ApexLog` records to retrieve. This flag can't be used with
-                                `--user`, `--time`, `--limit`, or `--all-users`.
+  -w, --where=<value>           WHERE clause used to filter `ApexLog` records to retrieve. This flag can't be used with
+                                `--user`, `--time`, or `--all-users`.
   -t, --time=<value>            Retrieve logs created in the last specified number of minutes.
   -u, --user=<value>            [default: targetusername] Username, Name, or ID of the user for whom you want to
                                 retrieve the logs.
@@ -97,8 +97,8 @@ DESCRIPTION
 
 EXAMPLES
   $ sf debug retrieve -o MyDeveloperEdition -u "Raffaele Preziosi" -t 10
-  $ sf debug retrieve -o MyDeveloperEdition -q "SELECT Id FROM ApexLog ORDER BY SystemModstamp DESC LIMIT 1" | rg "EXCEPTION"
-  $ sf debug retrieve -o MyDeveloperEdition -q "SELECT Id FROM ApexLog ORDER BY SystemModstamp DESC LIMIT 1" --output-format ndjson
+  $ sf debug retrieve -o MyDeveloperEdition -w "Operation = 'ApexTestHandler'" -l 1 | rg "EXCEPTION"
+  $ sf debug retrieve -o MyDeveloperEdition -w "Operation = 'ApexTestHandler'" -l 1 --output-format ndjson
 
 FLAG DESCRIPTIONS
   --api-version=<value>  API version to use.
@@ -235,7 +235,7 @@ Retrieve Apex log files from the Salesforce platform. If `--folder` is omitted, 
 
 ```
 USAGE
-  $ sf debug retrieve -o <value> [-u <value>] [-t <value>] [-l <value>] [-q <value>] [-d <value>] [--output-format text|ndjson] [-a]
+  $ sf debug retrieve -o <value> [-u <value>] [-t <value>] [-l <value>] [-w <value>] [-d <value>] [--output-format text|ndjson] [-a]
 
 FLAGS
   -a, --all-users               Retrieve log files for all users.
@@ -246,8 +246,8 @@ FLAGS
   --output-format=<option>      [default: text] How to write logs to stdout when --folder is omitted. Use text for raw
                                 log content or ndjson for one JSON object per log.
                                 <options: text|ndjson>
-  -q, --query=<value>           SOQL query used to select ApexLog records to retrieve. This flag can't be used with
-                                --user, --time, --limit, or --all-users.
+  -w, --where=<value>           WHERE clause used to filter ApexLog records to retrieve. This flag can't be used with
+                                --user, --time, or --all-users.
   -t, --time=<value>            The number of minutes to retrieve log files for.
   -u, --user=<value>            [default: current user] Username, Name, or ID of the user for whom you want to retrieve the logs.
 
@@ -257,9 +257,9 @@ GLOBAL FLAGS
 EXAMPLES
   sf debug retrieve -o DeveloperEdition -u "Raffaele Preziosi" -t 10
 
-  sf debug retrieve -o DeveloperEdition -q "SELECT Id FROM ApexLog ORDER BY SystemModstamp DESC LIMIT 1" | rg "EXCEPTION"
+  sf debug retrieve -o DeveloperEdition -w "Operation = 'ApexTestHandler'" -l 1 | rg "EXCEPTION"
 
-  sf debug retrieve -o DeveloperEdition -q "SELECT Id FROM ApexLog ORDER BY SystemModstamp DESC LIMIT 1" --output-format ndjson
+  sf debug retrieve -o DeveloperEdition -w "Operation = 'ApexTestHandler'" -l 1 --output-format ndjson
 ```
 
 ## `sf debug delete`

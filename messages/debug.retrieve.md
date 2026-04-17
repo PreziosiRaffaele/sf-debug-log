@@ -22,9 +22,9 @@ Retrieve logs created in the last specified number of minutes.
 
 The max number of log files to retrieve.
 
-# flags.query.summary
+# flags.where.summary
 
-SOQL query used to select `ApexLog` records to retrieve. This flag can't be used with `--user`, `--time`, `--limit`, or `--all-users`.
+WHERE clause used to filter `ApexLog` records to retrieve. This flag can't be used with `--user`, `--time`, or `--all-users`.
 
 # flags.folder.summary
 
@@ -49,5 +49,5 @@ Failed to save logs: %s.
 # examples
 
 sf debug retrieve -o MyDeveloperEdition -u "Raffaele Preziosi" -t 10
-sf debug retrieve -o MyDeveloperEdition -q "SELECT Id FROM ApexLog ORDER BY SystemModstamp DESC LIMIT 1" | rg "EXCEPTION"
-sf debug retrieve -o MyDeveloperEdition -q "SELECT Id FROM ApexLog ORDER BY SystemModstamp DESC LIMIT 1" --output-format ndjson
+sf debug retrieve -o MyDeveloperEdition -w "Operation = 'ApexTestHandler'" -l 1 | rg "EXCEPTION"
+sf debug retrieve -o MyDeveloperEdition -w "Operation = 'ApexTestHandler'" -l 1 --output-format ndjson

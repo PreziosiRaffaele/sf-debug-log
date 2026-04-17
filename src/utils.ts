@@ -101,6 +101,7 @@ export async function getLogs(conn: Connection, options: GetLogsOptions): Promis
     'LogLength',
     'Request',
     'Operation',
+    'LastModifiedDate',
     'Application',
     'Status',
     'DurationMilliseconds',
@@ -127,6 +128,11 @@ export async function getLogs(conn: Connection, options: GetLogsOptions): Promis
     whereConditions.push(`LogUserId = '${options.userId}'`);
   }
 
+  const whereClause = options.whereClause?.trim();
+  if (whereClause) {
+    whereConditions.push(normalizeWhereClause(whereClause));
+  }
+
   if (whereConditions.length > 0) {
     queryString += ` WHERE ${whereConditions.join(' AND ')}`;
   }
@@ -142,19 +148,8 @@ export async function getLogs(conn: Connection, options: GetLogsOptions): Promis
   return queryResult.records as ApexLog[];
 }
 
-export async function getLogsByQuery(conn: Connection, query: string): Promise<ApexLog[]> {
-  if (!/\bfrom\s+apexlog\b/i.test(query)) {
-    throw new Error('The --query SOQL must query ApexLog records.');
-  }
-
-  const queryResult = await conn.query(query);
-  const logs = queryResult.records as ApexLog[];
-
-  if (logs.some((log) => !log.Id)) {
-    throw new Error('The --query SOQL must select the ApexLog Id field.');
-  }
-
-  return logs;
+function normalizeWhereClause(whereClause: string): string {
+  return whereClause.replace(/^\s*where\s+/i, '');
 }
 
 export async function deleteLogs(conn: Connection, logs: ApexLog[]): Promise<void> {

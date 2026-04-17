@@ -8,10 +8,15 @@ export interface GetLogsOptions {
   timeLimit?: number | null;
   limit?: number | null;
   timeOlderThan?: number | null;
+  whereClause?: string | null;
 }
 
 export type ApexLog = {
   Id: string;
+  Request?: string | null;
+  Operation?: string | null;
+  LastModifiedDate?: string | null;
+  Status?: string | null;
   LogUser?: {
     Username?: string;
   };
