@@ -8,7 +8,7 @@ export interface GetLogsOptions {
   timeLimit?: number | null;
   limit?: number | null;
   timeOlderThan?: number | null;
-  whereClause?: string | null;
+  query?: string | null;
 }
 
 export type ApexLog = {

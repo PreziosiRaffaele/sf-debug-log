@@ -66,20 +66,22 @@ Retrieve Apex log files from the Salesforce platform.
 
 ```
 USAGE
-  $ sf debug retrieve -o <value> [--json] [--flags-dir <value>] [--api-version <value>] [-w <value> | [-u <value> |
-    -a] | -t <value> | -l <value> | ] [-d <value>] [--output-format text|ndjson]
+  $ sf debug retrieve -o <value> [--json] [--flags-dir <value>] [--api-version <value>] [-l <value> | -q <value> |
+    [-u <value> | -a] | -t <value> | ] [-d <value>] [--output-format text|ndjson]
 
 FLAGS
   -a, --all-users               Retrieve logs for all users in the org.
   -d, --folder=<value>          The folder where the retrieved log files will be stored. If omitted, the selected logs
                                 are streamed to stdout.
-  -l, --limit=<value>           [default: 100] The max number of log files to retrieve.
+  -l, --limit=<value>           [default: 100] The max number of log files to retrieve. This flag can't be used with
+                                `--query`.
   -o, --targetusername=<value>  (required) Username or alias of the target Salesforce org.
-  -w, --where=<value>           WHERE clause used to filter `ApexLog` records to retrieve. This flag can't be used with
-                                `--user`, `--time`, or `--all-users`.
   -t, --time=<value>            Retrieve logs created in the last specified number of minutes.
   -u, --user=<value>            [default: targetusername] Username, Name, or ID of the user for whom you want to
                                 retrieve the logs.
+  -q, --query=<value>           Full SOQL query used to select `ApexLog` records to retrieve. This flag can't be used
+                                with `--user`, `--time`, `--all-users`, or `--limit`. The command always replaces the
+                                query `SELECT` list with the fields it needs.
       --api-version=<value>     API version to use.
       --output-format=<option>  [default: text] How to write logs to stdout when `--folder` is omitted. Use `text` for
                                 raw log content or `ndjson` for one JSON object per log.
@@ -97,8 +99,8 @@ DESCRIPTION
 
 EXAMPLES
   $ sf debug retrieve -o MyDeveloperEdition -u "Raffaele Preziosi" -t 10
-  $ sf debug retrieve -o MyDeveloperEdition -w "Operation = 'ApexTestHandler'" -l 1 | rg "EXCEPTION"
-  $ sf debug retrieve -o MyDeveloperEdition -w "Operation = 'ApexTestHandler'" -l 1 --output-format ndjson
+  $ sf debug retrieve -o MyDeveloperEdition -q "SELECT Id FROM ApexLog WHERE Operation = 'ApexTestHandler' ORDER BY SystemModstamp DESC LIMIT 1" | rg "EXCEPTION"
+  $ sf debug retrieve -o MyDeveloperEdition -q "SELECT Id FROM ApexLog WHERE Operation = 'ApexTestHandler' ORDER BY SystemModstamp DESC LIMIT 1" --output-format ndjson
 
 FLAG DESCRIPTIONS
   --api-version=<value>  API version to use.
@@ -198,124 +200,6 @@ FLAG DESCRIPTIONS
     Override the api version used for api requests made by this command
 ```
 <!-- commandsstop -->
-- [`sf trace new`](#sf-trace-new)
-- [`sf debug retrieve`](#sf-debug-retrieve)
-- [`sf debug delete`](#sf-debug-delete)
-- [`sf debuglevel list`](#sf-debuglevel-list)
-- [`sf debuglevel new`](#sf-debuglevel-new)
-
-## `sf trace new`
-
-Create a new trace flag.
-
-```
-USAGE
-  $ sf trace new -o <value> -d <value> [-u <value>] [-t <value>] [-f]
-
-FLAGS
-  -d, --debuglevel=<value>      [default: SFDC_DevConsole] The debug level for the trace flag.
-  -f, --force                   Force the creation of a new trace flag, even if one already exists for the user.
-  -o, --targetusername=<value>  (required) Username or alias of the target Salesforce org.
-  -t, --time=<value>            [default: 60] The number of minutes to trace.
-  -u, --user=<value>            [default: current user] Username, Name, or ID of the user for whom you want to retrieve the logs.
-
-GLOBAL FLAGS
-  --json  Format output as json.
-
-DESCRIPTION
-  This command is used to create a trace flag for a specific user in the Salesforce org.
-
-EXAMPLES
-  sf trace new -o DeveloperEdition -u "Raffaele Preziosi" -t 10 -d "MyDebugLevel"
-```
-
-## `sf debug retrieve`
-
-Retrieve Apex log files from the Salesforce platform. If `--folder` is omitted, the selected logs are streamed to stdout either as raw text or as NDJSON.
-
-```
-USAGE
-  $ sf debug retrieve -o <value> [-u <value>] [-t <value>] [-l <value>] [-w <value>] [-d <value>] [--output-format text|ndjson] [-a]
-
-FLAGS
-  -a, --all-users               Retrieve log files for all users.
-  -d, --folder=<value>          The folder where the retrieved log files will be stored. If omitted, the selected logs
-                                are streamed to stdout.
-  -o, --targetusername=<value>  (required) Username or alias of the target Salesforce org.
-  -l, --limit=<value>           [default: 100] The max number of log files to retrieve.
-  --output-format=<option>      [default: text] How to write logs to stdout when --folder is omitted. Use text for raw
-                                log content or ndjson for one JSON object per log.
-                                <options: text|ndjson>
-  -w, --where=<value>           WHERE clause used to filter ApexLog records to retrieve. This flag can't be used with
-                                --user, --time, or --all-users.
-  -t, --time=<value>            The number of minutes to retrieve log files for.
-  -u, --user=<value>            [default: current user] Username, Name, or ID of the user for whom you want to retrieve the logs.
-
-GLOBAL FLAGS
-  --json  Format output as json.
-
-EXAMPLES
-  sf debug retrieve -o DeveloperEdition -u "Raffaele Preziosi" -t 10
-
-  sf debug retrieve -o DeveloperEdition -w "Operation = 'ApexTestHandler'" -l 1 | rg "EXCEPTION"
-
-  sf debug retrieve -o DeveloperEdition -w "Operation = 'ApexTestHandler'" -l 1 --output-format ndjson
-```
-
-## `sf debug delete`
-
-Delete Apex log files from a Salesforce org.
-
-```
-USAGE
-  $ sf debug delete -o <value> [--json] [-u <value>] [-t <value>] [-a]
-
-FLAGS
-  -a, --all-users               Delete log files for all users.
-  -o, --targetusername=<value>  (required) Username or alias of the target Salesforce org.
-  -t, --time=<value>            Delete logs older than the specified number of minutes.
-  -u, --user=<value>            [default: current user] Username, Name, or ID of the user for whom you want to retrieve the logs.
-
-GLOBAL FLAGS
-  --json  Format output as json.
-
-EXAMPLES
-  sf debug delete -o DeveloperEdition -u "Raffaele Preziosi" -t 10
-```
-
-## `sf debuglevel list`
-
-List all DebugLevels in the org.
-
-```
-USAGE
-  $ sf debuglevel list -o <value>
-
-FLAGS
-  -o, --targetusername=<value>  (required) Username or alias of the target Salesforce org.
-
-GLOBAL FLAGS
-  --json  Format output as json.
-
-EXAMPLES
-  sf debuglevel list -o DeveloperEdition
-```
-
-## `sf debuglevel new`
-
-Create a new DebugLevel.
-
-```
-USAGE
-  $ sf debuglevel new -o <value> [-n <value>]
-
-FLAGS
-  -n, --name=<value>            (required) The developer name of the new DebugLevel.
-  -o, --targetusername=<value>  (required) Username or alias of the target Salesforce org.
-
-GLOBAL FLAGS
-  --json  Format output as json.
-
 DESCRIPTION
   Create a new DebugLevel assigning level for each category.
 

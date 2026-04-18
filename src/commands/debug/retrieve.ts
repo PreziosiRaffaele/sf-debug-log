@@ -15,7 +15,7 @@ const messages = Messages.loadMessages('sf-debug-log', 'debug.retrieve');
 import type { ApexLog, GetLogsOptions } from '../../types.js';
 
 const pipeline = promisify(nodePipeline);
-const WHERE_EXCLUSIVE_FLAGS = ['user', 'time', 'all-users'];
+const QUERY_EXCLUSIVE_FLAGS = ['user', 'time', 'all-users', 'limit'];
 const EMPTY_DOWNLOAD_SUMMARY: DownloadSummary = { failedCount: 0, savedCount: 0 };
 const OUTPUT_FORMATS = ['text', 'ndjson'] as const;
 
@@ -52,11 +52,12 @@ export default class Retrieve extends SfCommand<void> {
       summary: messages.getMessage('flags.limit.summary'),
       char: 'l',
       default: 100,
+      exclusive: ['query'],
     }),
-    where: Flags.string({
-      summary: messages.getMessage('flags.where.summary'),
-      char: 'w',
-      exclusive: WHERE_EXCLUSIVE_FLAGS,
+    query: Flags.string({
+      summary: messages.getMessage('flags.query.summary'),
+      char: 'q',
+      exclusive: QUERY_EXCLUSIVE_FLAGS,
     }),
     folder: Flags.directory({
       summary: messages.getMessage('flags.folder.summary'),
@@ -225,11 +226,11 @@ export default class Retrieve extends SfCommand<void> {
 
   private async getLogsFromFlags(
     conn: Connection,
-    flags: Pick<RetrieveFlags, 'user' | 'time' | 'limit' | 'all-users' | 'where'>
+    flags: Pick<RetrieveFlags, 'user' | 'time' | 'limit' | 'all-users' | 'query'>
   ): Promise<ApexLog[]> {
     const getLogsOptions: GetLogsOptions = {};
 
-    if (!flags['all-users'] && flags.where === undefined) {
+    if (!flags['all-users'] && flags.query === undefined) {
       const user = flags.user ?? (conn.getUsername() as string);
       const userId = await getUserId(conn, user);
       if (!userId) {
@@ -247,8 +248,8 @@ export default class Retrieve extends SfCommand<void> {
       getLogsOptions.limit = flags.limit;
     }
 
-    if (flags.where !== undefined) {
-      getLogsOptions.whereClause = flags.where;
+    if (flags.query !== undefined) {
+      getLogsOptions.query = flags.query;
     }
 
     return getLogs(conn, getLogsOptions);

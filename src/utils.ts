@@ -8,6 +8,19 @@ const mkdirPromise = promisify(mkdir);
 const writeFilePromise = promisify(writeFile);
 
 const MILLISECONDS_PER_MINUTE = 60000;
+const DEFAULT_APEX_LOG_FIELDS = [
+  'Id',
+  'LogUser.Username',
+  'LogLength',
+  'Request',
+  'Operation',
+  'LastModifiedDate',
+  'Application',
+  'Status',
+  'DurationMilliseconds',
+  'SystemModstamp',
+  'RequestIdentifier',
+];
 
 export async function createFile(path: string, contents: string): Promise<void> {
   await mkdirPromise(dirname(path), { recursive: true });
@@ -95,22 +108,17 @@ export async function createDebugLevel(
 }
 
 export async function getLogs(conn: Connection, options: GetLogsOptions): Promise<ApexLog[]> {
-  const LOG_FIELDS = [
-    'Id',
-    'LogUser.Username',
-    'LogLength',
-    'Request',
-    'Operation',
-    'LastModifiedDate',
-    'Application',
-    'Status',
-    'DurationMilliseconds',
-    'SystemModstamp',
-    'RequestIdentifier',
-  ];
-  let queryString = `SELECT ${LOG_FIELDS.join(',')} FROM ApexLog`;
+  let queryString = options.query?.trim()
+    ? rewriteApexLogQueryFields(options.query, DEFAULT_APEX_LOG_FIELDS)
+    : `SELECT ${DEFAULT_APEX_LOG_FIELDS.join(',')} FROM ApexLog`;
 
   const whereConditions = [];
+
+  if (options.query?.trim()) {
+    const queryResult = await conn.query(queryString);
+
+    return queryResult.records as ApexLog[];
+  }
 
   const minutes = options.timeLimit ?? options.timeOlderThan;
   if (minutes) {
@@ -128,11 +136,6 @@ export async function getLogs(conn: Connection, options: GetLogsOptions): Promis
     whereConditions.push(`LogUserId = '${options.userId}'`);
   }
 
-  const whereClause = options.whereClause?.trim();
-  if (whereClause) {
-    whereConditions.push(normalizeWhereClause(whereClause));
-  }
-
   if (whereConditions.length > 0) {
     queryString += ` WHERE ${whereConditions.join(' AND ')}`;
   }
@@ -148,8 +151,15 @@ export async function getLogs(conn: Connection, options: GetLogsOptions): Promis
   return queryResult.records as ApexLog[];
 }
 
-function normalizeWhereClause(whereClause: string): string {
-  return whereClause.replace(/^\s*where\s+/i, '');
+export function rewriteApexLogQueryFields(query: string, fields: string[]): string {
+  const match = /^\s*select\s+[\s\S]+?(\s+from\s+apexlog\b[\s\S]*)$/i.exec(query);
+
+  if (!match) {
+    throw new Error('The query must start with SELECT ... FROM ApexLog.');
+  }
+
+  const [, querySuffix] = match;
+  return `SELECT ${fields.join(', ')}${querySuffix}`;
 }
 
 export async function deleteLogs(conn: Connection, logs: ApexLog[]): Promise<void> {
