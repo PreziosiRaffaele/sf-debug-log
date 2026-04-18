@@ -66,8 +66,8 @@ Retrieve Apex log files from the Salesforce platform.
 
 ```
 USAGE
-  $ sf debug retrieve -o <value> [--json] [--flags-dir <value>] [--api-version <value>] [-l <value> | -q <value> |
-    [-u <value> | -a] | -t <value> | ] [-d <value>] [--output-format text|ndjson]
+  $ sf debug retrieve -o <value> [--json] [--flags-dir <value>] [--api-version <value>] [-u <value> | -a] [-t
+    <value>] [-l <value> | -q <value>] [-d <value>] [--output-format text|ndjson]
 
 FLAGS
   -a, --all-users               Retrieve logs for all users in the org.
@@ -76,12 +76,12 @@ FLAGS
   -l, --limit=<value>           [default: 100] The max number of log files to retrieve. This flag can't be used with
                                 `--query`.
   -o, --targetusername=<value>  (required) Username or alias of the target Salesforce org.
-  -t, --time=<value>            Retrieve logs created in the last specified number of minutes.
-  -u, --user=<value>            [default: targetusername] Username, Name, or ID of the user for whom you want to
-                                retrieve the logs.
   -q, --query=<value>           Full SOQL query used to select `ApexLog` records to retrieve. This flag can't be used
                                 with `--user`, `--time`, `--all-users`, or `--limit`. The command always replaces the
                                 query `SELECT` list with the fields it needs.
+  -t, --time=<value>            Retrieve logs created in the last specified number of minutes.
+  -u, --user=<value>            [default: targetusername] Username, Name, or ID of the user for whom you want to
+                                retrieve the logs.
       --api-version=<value>     API version to use.
       --output-format=<option>  [default: text] How to write logs to stdout when `--folder` is omitted. Use `text` for
                                 raw log content or `ndjson` for one JSON object per log.
