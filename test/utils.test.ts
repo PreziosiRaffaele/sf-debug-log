@@ -1,11 +1,6 @@
 import { expect } from 'chai';
-import { rewriteApexLogQueryFields, getLogs } from '../src/utils';
-
-const rewriteQueryFields = rewriteApexLogQueryFields as (query: string, fields: string[]) => string;
-const runGetLogs = getLogs as (
-  conn: { query: (query: string) => Promise<{ records: never[] }> },
-  options: { query: string; limit: number }
-) => Promise<unknown>;
+import type { Connection } from '@salesforce/core';
+import { rewriteApexLogQueryFields, getLogs } from '../src/utils.js';
 
 describe('utils', () => {
   describe('rewriteApexLogQueryFields', () => {
@@ -13,7 +8,7 @@ describe('utils', () => {
       const query = "SELECT Id FROM ApexLog WHERE Operation = 'ExecuteAnonymous'";
       const requiredFields: string[] = ['Id', 'Request', 'Operation', 'LastModifiedDate', 'Status'];
 
-      const result: string = rewriteQueryFields(query, requiredFields);
+      const result: string = rewriteApexLogQueryFields(query, requiredFields);
 
       expect(result).to.equal(
         "SELECT Id, Request, Operation, LastModifiedDate, Status FROM ApexLog WHERE Operation = 'ExecuteAnonymous'"
@@ -25,7 +20,7 @@ describe('utils', () => {
         'SELECT Id, Foo__c, Bar__c FROM ApexLog ORDER BY LastModifiedDate DESC';
       const requiredFields: string[] = ['Id', 'Request', 'Operation', 'LastModifiedDate', 'Status'];
 
-      const result: string = rewriteQueryFields(query, requiredFields);
+      const result: string = rewriteApexLogQueryFields(query, requiredFields);
 
       expect(result).to.equal(
         'SELECT Id, Request, Operation, LastModifiedDate, Status FROM ApexLog ORDER BY LastModifiedDate DESC'
@@ -43,14 +38,17 @@ describe('utils', () => {
         },
       };
 
-      await runGetLogs(conn, {
+      // Only `query` is used by getLogs, so a minimal fake stands in for the Connection.
+      await getLogs(conn as unknown as Connection, {
         query: "SELECT Id FROM ApexLog WHERE Operation = 'API'",
         limit: 5,
       });
 
       expect(executedQuery).to.equal(
-        "SELECT Id, Request, Operation, LastModifiedDate, Status FROM ApexLog WHERE Operation = 'API'"
+        'SELECT Id, LogUser.Username, LogLength, Request, Operation, LastModifiedDate, Application, Status, ' +
+          "DurationMilliseconds, SystemModstamp, RequestIdentifier FROM ApexLog WHERE Operation = 'API'"
       );
+      expect(executedQuery).to.not.match(/\bLIMIT\b/i);
     });
   });
 });
