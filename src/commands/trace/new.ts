@@ -55,7 +55,9 @@ export default class TraceNew extends SfCommand<void> {
   public async run(): Promise<void> {
     const { flags } = await this.parse(TraceNew);
     const conn: Connection = flags.targetusername.getConnection(flags['api-version']);
-    const user = flags.user ? flags.user : (conn.getUsername() as string);
+    // `||`, not `??`: an empty --user still falls back to the org's username.
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+    const user = flags.user || conn.getUsername()!;
     const userId = await getUserId(conn, user);
     if (!userId) {
       this.error(`User ${user} not found`);
@@ -74,11 +76,11 @@ export default class TraceNew extends SfCommand<void> {
       ? debugLevels.find((level) => level.DeveloperName === flags.debuglevel)?.Id
       : await TraceNew.selectDebugLevel(debugLevels);
     if (!debugLevelId) {
-      this.error(`Debug Level ${flags.debuglevel} not found`);
+      this.error(flags.debuglevel ? `Debug Level ${flags.debuglevel} not found` : 'No Debug Level selected');
     }
     const result = await createTraceFlag(conn, userId, debugLevelId, flags.time);
     if (!result.isSuccess) {
-      this.error(`Error to create Trace Flag: ${result.error}`);
+      this.error(`Error to create Trace Flag: ${result.error ?? 'unknown error'}`);
     } else {
       this.log(`Trace flag created for ${user}`);
     }

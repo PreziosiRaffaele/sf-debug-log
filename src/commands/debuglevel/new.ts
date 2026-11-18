@@ -58,7 +58,7 @@ export default class DebuglevelNew extends SfCommand<void> {
 
     const result = await createDebugLevel(conn, debugLevel);
     if (!result.isSuccess) {
-      this.error(`Error to create Debug Level: ${result.error}`);
+      this.error(`Error to create Debug Level: ${result.error ?? 'unknown error'}`);
     } else {
       this.log(`Debug Level ${flags.developername} created successfully.`);
     }

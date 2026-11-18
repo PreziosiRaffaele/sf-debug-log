@@ -19,6 +19,7 @@ const QUERY_EXCLUSIVE_FLAGS = ['user', 'time', 'all-users', 'limit'];
 const EMPTY_DOWNLOAD_SUMMARY: DownloadSummary = { failedCount: 0, savedCount: 0 };
 const OUTPUT_FORMATS = ['text', 'ndjson'] as const;
 
+// eslint-disable-next-line sf-plugin/only-extend-SfCommand -- an Error subclass, not a command
 class PartialNdjsonStreamError extends Error {
   public constructor(message: string, public readonly cause: unknown) {
     super(message);
@@ -231,7 +232,7 @@ export default class Retrieve extends SfCommand<void> {
     const getLogsOptions: GetLogsOptions = {};
 
     if (!flags['all-users'] && flags.query === undefined) {
-      const user = flags.user ?? (conn.getUsername() as string);
+      const user = flags.user ?? conn.getUsername()!;
       const userId = await getUserId(conn, user);
       if (!userId) {
         this.error(`User ${user} not found`);

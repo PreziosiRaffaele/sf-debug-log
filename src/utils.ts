@@ -1,6 +1,6 @@
-import { dirname } from 'path';
-import { promisify } from 'util';
-import { writeFile, mkdir } from 'fs';
+import { dirname } from 'node:path';
+import { promisify } from 'node:util';
+import { writeFile, mkdir } from 'node:fs';
 import { Connection } from '@salesforce/core';
 import type { SaveResult, ApexLog, TraceFlag, DebugLevel, DebugLevelCreate, GetLogsOptions } from './types.js';
 

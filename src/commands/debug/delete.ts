@@ -46,7 +46,9 @@ export default class DebugDelete extends SfCommand<void> {
     const getLogsOptions: GetLogsOptions = {};
 
     if (!flags['all-users']) {
-      const user = flags.user ? flags.user : (conn.getUsername() as string);
+      // `||`, not `??`: an empty --user still falls back to the org's username.
+      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+      const user = flags.user || conn.getUsername()!;
       const userId = await getUserId(conn, user);
       if (!userId) {
         this.error(`User ${user} not found`);
